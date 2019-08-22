@@ -5,8 +5,8 @@ logo: /static/img/avatar.png
 github: https://github.com/apocope
 about: Linguist
 
-baseurl: "https://codeasashu.github.io/hcz-jekyll-blog"
-url: "https://codeasashu.github.io/hcz-jekyll-blog"
+baseurl: "www.nlpnotebook.com"
+url: "www.nlpnotebook.com"
 
 allowsearch: true
 
