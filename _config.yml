@@ -5,8 +5,8 @@ logo: /static/img/avatar.png
 github: https://github.com/apocope
 about: Linguist
 
-baseurl: "www.nlpnotebook.com"
-url: "www.nlpnotebook.com"
+# baseurl: "www.nlpnotebook.com"
+# url: "www.nlpnotebook.com"
 
 allowsearch: true
 
