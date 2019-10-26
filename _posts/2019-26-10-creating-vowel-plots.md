@@ -1,7 +1,7 @@
 ---
 title: "Creating Vowel Plots in R"
 author: "Daniel Dorado"
-date: "April 19, 2018"
+date: "October 26, 2019"
 output:
   html_document:
     keep_md: true
@@ -129,7 +129,7 @@ ggplot(data=eng)+
   geom_point()
 ```
 
-![](2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](assets/2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 ```r
 # A more idomatic example of the above code
@@ -148,7 +148,7 @@ ggplot(data=eng, aes(x=F2, y=F1,
   geom_text()
 ```
 
-![](2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](assets/2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 
 
 Traditionally, since F1 is associated with vowel height, and F2, vowel backness, should the axes be reversed, the plot will read very much like the IPA vowel trapezoid! Meaning a vowel to the right, is back vowel, a vowel to the left is front vowel, and the higher it is on plot the higher the vowel and the lower it is on the plot, the lower the vowel. 
@@ -164,7 +164,7 @@ ggplot(data=eng, aes(x=F2, y=F1, label=vowel, color=vowel))+
   scale_y_reverse()
 ```
 
-![](2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+![](assets/2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 I'm sure you noticed the legend. Ugly. Let's get rid of it, and add a title.
 
@@ -180,7 +180,7 @@ ggplot(data=eng, aes(x=F2, y=F1,
   theme(legend.position="none")
 ```
 
-![](2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](assets/2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
 
 
 Let's add another layer (another geom) to highlight my entire vowel space.  First we'll need to get collect the convex hull.  While not necessary for a simple example, we'll make a little function to extract it, to make things easier for when we plot the English and Spanish vowels on the same plot.
@@ -210,7 +210,7 @@ ggplot(data=eng, aes(x=F2, y=F1,
   geom_polygon(data=eng_hull)
 ```
 
-![](2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+![](assets/2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 Now, you can change the color by adding a color to the fill attribute to a new aesthetic mapping in the geom_polygon. Since this is a new layer, we include a new `aes` function. Technically, we could add a fill attribute to the original `aes`, but then ggplot2 will choose colors for you.  Why settle when you have such a wide breadth of [colors](http://sape.inf.usi.ch/quick-reference/ggplot2/colour) at your disposal? 
 
@@ -232,7 +232,7 @@ ggplot(data=eng)+
   scale_fill_manual(values = "thistle")
 ```
 
-![](2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
+![](assets/2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 Alright, much better! So now that you can graph a single set of vowels into one space. Let's include Spanish on the same chart. We'll include `guides(color=FALSE)` to delete the additional color legend we don't need. Try the code with and without it.  We'll use ddply to subset the dataframe based on the language and finds the hulls for both languages.  This can also be done for indivdidual vowels, but there isn't enough observations in the example data.
 
@@ -254,7 +254,7 @@ ggplot(data=data, aes(x=F2,
   scale_fill_discrete(name="Language")
 ```
 
-![](2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+![](assets/2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
 
 ```r
@@ -274,7 +274,8 @@ ggplot(data=data, aes(x=F2,
   scale_fill_discrete(name="Language")
 ```
 
-![](2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+![](assets/2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+    assets/2019-26-10-creating-vowel-plots_files/figure-html/
 
 
 ## Plotting F2-F1
@@ -309,4 +310,4 @@ ggplot(data=data)+
   theme_bw()
 ```
 
-![](2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+![](assets/2019-26-10-creating-vowel-plots_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
