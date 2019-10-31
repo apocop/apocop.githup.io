@@ -17,12 +17,12 @@
   },
   {
     "text": "Resume",
-    "url": "/#",
+    "url": "/resume",
     "icon": "fa-graduation-cap",
   },
   {
     "text": "Github",
-    "url": "/#",
+    "url": "https://github.com/apocop",
     "icon": "fa-github"
   },
   {
