@@ -97,13 +97,9 @@
               <p class="list-group-item-text">Linguist</p>
               <div class="social-icons">
 	
-        <a class="icon" target="_blank" href=""><i class="fa fa-facebook"></i></a>
+        <a class="icon" target="_blank" href=""><i class="fa "></i></a>
     
-        <a class="icon" target="_blank" href=""><i class="fa fa-twitter"></i></a>
-    
-        <a class="icon" target="_blank" href=""><i class="fa fa-linkedin"></i></a>
-    
-        <a class="icon" target="_blank" href=""><i class="fa fa-stack-exchange"></i></a>
+        <a class="icon" target="_blank" href=""><i class="fa "></i></a>
     
 </div>
 
@@ -192,7 +188,7 @@
 	
     
 	
-	<li class="col-lg-12 col-md-12 col-sm-4 col-xs-12  creating-vowel-plots.html"><a href="/#" target="_self"><i class="fa fa-graduation-cap"></i> Resume</a></li>
+	<li class="col-lg-12 col-md-12 col-sm-4 col-xs-12  creating-vowel-plots.html"><a href="/resume" target="_self"><i class="fa fa-graduation-cap"></i> Resume</a></li>
 
 	
 	
@@ -202,7 +198,7 @@
 	
     
 	
-	<li class="col-lg-12 col-md-12 col-sm-4 col-xs-12  creating-vowel-plots.html"><a href="/#" target="_self"><i class="fa fa-github"></i> Github</a></li>
+	<li class="col-lg-12 col-md-12 col-sm-4 col-xs-12  creating-vowel-plots.html"><a href="https://github.com/apocop" target="_self"><i class="fa fa-github"></i> Github</a></li>
 
 	
 	
@@ -241,29 +237,26 @@
 
 <p>First things first, import ggplot2 and plyr.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="s1">'ggplot2'</span><span class="p">)</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="s1">'ggplot2'</span><span class="p">)</span><span class="w">
 </span><span class="n">library</span><span class="p">(</span><span class="s1">'plyr'</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <h3 id="import-the-data">Import the Data</h3>
 
 <p>I suggest you take a take a look at the CSV file before you view the summary in R.  Since the labels we’ll be using to represent the vowels are from the International Phonetic Alphabet (IPA), the encoding has to be set to UTF-8, otherwise R will not recognize the special characters, and they will be distorted when you plot them.  Here we use the <code class="highlighter-rouge">read.delim</code> function to import the CSV into R as a data-frame.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.delim</span><span class="p">(</span><span class="s1">'vowels.csv'</span><span class="p">,</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.delim</span><span class="p">(</span><span class="s1">'vowels.csv'</span><span class="p">,</span><span class="w">
                </span><span class="n">header</span><span class="o">=</span><span class="m">1</span><span class="p">,</span><span class="w">
                </span><span class="n">sep</span><span class="o">=</span><span class="s2">","</span><span class="p">,</span><span class="w">
                </span><span class="n">encoding</span><span class="o">=</span><span class="s2">"UTF-8"</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>Let’s review the data. Print data to the console and you’ll see a small data-set of 13 observations.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">data</span><span class="w">
-</span></code></pre>
-</div>
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span><span class="w">
+</span></code></pre></div></div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>##    X.U.FEFF.words  F1   F2    vowel language
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##    X.U.FEFF.words  F1   F2    vowel language
 ## 1            heed 261 2049        i  English
 ## 2             hid 388 1947 &lt;U+026A&gt;  English
 ## 3            head 439 1896 &lt;U+025B&gt;  English
@@ -278,18 +271,16 @@
 ## 12          hache 711 1561        a  Spanish
 ## 13           ocho 433  795        o  Spanish
 ## 14           hube 346  680        u  Spanish
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="a-sidenote-regarding-excel">A Sidenote Regarding Excel.</h3>
 <p>Unfortunately, When Excel generates a file in UTF-8, “<strong>X.U.FEFF.</strong>”, is prepended to the file  This explains the strange name for the first column, X.U.FEFF.words. It doesn’t really cause a problem, but being ugly, and awkward to remember and type, we rename the column to <em>words</em> as it was intended.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">colnames</span><span class="p">(</span><span class="n">data</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s2">"words"</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">colnames</span><span class="p">(</span><span class="n">data</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s2">"words"</span><span class="w">
 </span><span class="n">data</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>##    words  F1   F2    vowel language
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##    words  F1   F2    vowel language
 ## 1   heed 261 2049        i  English
 ## 2    hid 388 1947 &lt;U+026A&gt;  English
 ## 3   head 439 1896 &lt;U+025B&gt;  English
@@ -304,15 +295,13 @@
 ## 12 hache 711 1561        a  Spanish
 ## 13  ocho 433  795        o  Spanish
 ## 14  hube 346  680        u  Spanish
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>Here we’re going to subset the data-frame into two separate variables so that we can work with either language individually.  We’ll continue with English for the moment.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">eng</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="o">$</span><span class="n">language</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"English"</span><span class="p">)</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">eng</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="o">$</span><span class="n">language</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"English"</span><span class="p">)</span><span class="w">
 </span><span class="n">spa</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="o">$</span><span class="n">language</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"Spanish"</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <h3 id="a-basic-plot">A Basic Plot</h3>
 
@@ -330,29 +319,26 @@
   <p>Unique to ggplot2, the plus sign (+) allows you to <em>add</em> plot components together.</p>
 </blockquote>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">)</span><span class="o">+</span><span class="w">
-  </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">F</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="nb">F</span><span class="m">1</span><span class="p">)</span><span class="o">+</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">geom_point</span><span class="p">()</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-6-1.png" alt="" /></p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="c1"># A more idomatic example of the above code.
-</span><span class="w">
-</span><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">F</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="nb">F</span><span class="m">1</span><span class="p">))</span><span class="o">+</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># A more idomatic example of the above code.</span><span class="w">
+
+</span><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">))</span><span class="o">+</span><span class="w">
 </span><span class="n">geom_point</span><span class="p">()</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>Rather than points representing each vowel, let’s arrange it so that the IPA symbol is plotted.  Replace <code class="highlighter-rouge">geom_point</code> with <code class="highlighter-rouge">geom_text</code>.  Inside <code class="highlighter-rouge">aes()</code> include the new argument, <em>label</em>, which we’ll asign the vowel column in our data-frame, <em>eng</em>.  Let’s also pass the color attribute.  By assigning the vowel column to color, ggplot2 will automatically assign a color to each of our labels.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">F</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="nb">F</span><span class="m">1</span><span class="p">,</span><span class="w"> 
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
                      </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w"> 
                      </span><span class="n">color</span><span class="o">=</span><span class="n">vowel</span><span class="p">))</span><span class="o">+</span><span class="w">
   </span><span class="n">geom_text</span><span class="p">()</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-7-1.png" alt="" /><!-- --></p>
 
@@ -360,18 +346,17 @@
 
 <p>To reverse an axis, like the x-axis, we use <code class="highlighter-rouge">scale_x_reverse()</code> and for the y-axis, <code class="highlighter-rouge">scale_y_reverse</code>.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">F</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="nb">F</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">vowel</span><span class="p">))</span><span class="o">+</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">vowel</span><span class="p">))</span><span class="o">+</span><span class="w">
   </span><span class="n">geom_text</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w">
   </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w">
   </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-8-1.png" alt="" /><!-- --></p>
 
 <p>I’m sure you noticed the legend. Ugly. Let’s get rid of it, and add a title.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">F</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="nb">F</span><span class="m">1</span><span class="p">,</span><span class="w"> 
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
                      </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w">
                      </span><span class="n">color</span><span class="o">=</span><span class="n">vowel</span><span class="p">))</span><span class="o">+</span><span class="w">
   </span><span class="n">geom_text</span><span class="p">()</span><span class="o">+</span><span class="w">
@@ -379,24 +364,22 @@
   </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
   </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Daniel's English Vowels"</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-9-1.png" alt="" /><!-- --></p>
 
 <p>Let’s add another layer (another geom) to highlight my entire vowel space.  First we’ll need to get the convex hull.  While not necessary for a simple example, we’ll make a little function to extract it, to make things easier for when we plot the English and Spanish vowels on the same plot.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">find_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-  </span><span class="n">dataframe</span><span class="p">[</span><span class="n">chull</span><span class="p">(</span><span class="n">dataframe</span><span class="o">$</span><span class="nb">F</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">dataframe</span><span class="o">$</span><span class="nb">F</span><span class="m">1</span><span class="p">),</span><span class="w"> </span><span class="p">]</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">find_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="n">dataframe</span><span class="p">[</span><span class="n">chull</span><span class="p">(</span><span class="n">dataframe</span><span class="o">$</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">dataframe</span><span class="o">$</span><span class="n">F1</span><span class="p">),</span><span class="w"> </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 
 </span><span class="n">eng_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">find_hull</span><span class="p">(</span><span class="n">eng</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p>To include the convex hull, lets add an additional layer,the <code class="highlighter-rouge">geom_polygon</code> and pass <code class="highlighter-rouge">eng_hull</code> as the data parameter.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">F</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="nb">F</span><span class="m">1</span><span class="p">,</span><span class="w"> 
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
                      </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">))</span><span class="o">+</span><span class="w">
   </span><span class="n">geom_text</span><span class="p">()</span><span class="o">+</span><span class="w">
   </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
@@ -404,8 +387,7 @@
   </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"English Vowel Hull"</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng_hull</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-11-1.png" alt="" /><!-- --></p>
 
@@ -413,29 +395,28 @@
 
 <p>Notice how labels are a bit difficult to read being behind the polygon, let’s include the alpha attribute to make and make the polygon layer transparent.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">)</span><span class="o">+</span><span class="w">
-  </span><span class="n">geom_text</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">F</span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="nb">F</span><span class="m">1</span><span class="p">,</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_text</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w">
                 </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w">
                 </span><span class="n">color</span><span class="o">=</span><span class="n">vowel</span><span class="p">))</span><span class="o">+</span><span class="w">
   </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
   </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
   </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Plotting the English Vowel Hull"</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span><span class="o">+</span><span class="w">
-  </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng_hull</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">F</span><span class="m">2</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="nb">F</span><span class="m">1</span><span class="p">,</span><span class="w">
+  </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng_hull</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w">
                                   </span><span class="n">fill</span><span class="o">=</span><span class="n">language</span><span class="p">,</span><span class="w">
                                   </span><span class="n">alpha</span><span class="o">=</span><span class="m">.9</span><span class="p">))</span><span class="o">+</span><span class="w">
   </span><span class="n">scale_fill_manual</span><span class="p">(</span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"thistle"</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-12-1.png" alt="" /><!-- --></p>
 
 <p>Alright, much better! So now that you can graph a single set of vowels into one space. Let’s include Spanish on the same chart. We’ll include <code class="highlighter-rouge">guides(color=FALSE)</code> to delete the additional color legend we don’t need. Try the code with and without it.  We’ll use ddply to subset the dataframe based on the language and finds the hulls for both languages.  This can also be done for indivdidual vowels, but there isn’t enough observations in the example data.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">lang_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ddply</span><span class="p">(</span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="nb">F</span><span class="m">1</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">language</span><span class="p">),</span><span class="w"> </span><span class="n">find_hull</span><span class="p">)</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lang_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ddply</span><span class="p">(</span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">F1</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">language</span><span class="p">),</span><span class="w"> </span><span class="n">find_hull</span><span class="p">)</span><span class="w">
 
-</span><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">F</span><span class="m">2</span><span class="p">,</span><span class="w"> 
-                      </span><span class="n">y</span><span class="o">=</span><span class="nb">F</span><span class="m">1</span><span class="p">,</span><span class="w"> 
+</span><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> 
+                      </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
                       </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w">
                       </span><span class="n">color</span><span class="o">=</span><span class="n">language</span><span class="p">,</span><span class="w">
                       </span><span class="n">fill</span><span class="o">=</span><span class="n">language</span><span class="p">))</span><span class="o">+</span><span class="w">
@@ -446,27 +427,25 @@
   </span><span class="n">guides</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lang_hull</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="o">=</span><span class="m">.2</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">scale_fill_discrete</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Language"</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-13-1.png" alt="" /><!-- --></p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">lang_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">plyr</span><span class="o">::</span><span class="n">ddply</span><span class="p">(</span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="nb">F</span><span class="m">1</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">language</span><span class="p">),</span><span class="w"> </span><span class="n">find_hull</span><span class="p">)</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lang_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">plyr</span><span class="o">::</span><span class="n">ddply</span><span class="p">(</span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">F1</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">language</span><span class="p">),</span><span class="w"> </span><span class="n">find_hull</span><span class="p">)</span><span class="w">
 
-</span><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="nb">F</span><span class="m">2</span><span class="p">,</span><span class="w"> 
-                      </span><span class="n">y</span><span class="o">=</span><span class="nb">F</span><span class="m">1</span><span class="p">,</span><span class="w"> 
+</span><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> 
+                      </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
                       </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w">
                       </span><span class="n">fill</span><span class="o">=</span><span class="n">language</span><span class="p">))</span><span class="o">+</span><span class="w">
   </span><span class="n">geom_text</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w">
   </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
   </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
   </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Daniel's English &amp; Spanish Vowel Space"</span><span class="p">)</span><span class="o">+</span><span class="w">
-  </span><span class="c1">#theme(legend.position = "None")+
-</span><span class="w">  </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lang_hull</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="o">=</span><span class="m">.4</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="c1">#theme(legend.position = "None")+</span><span class="w">
+  </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lang_hull</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="o">=</span><span class="m">.4</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">guides</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">scale_fill_discrete</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Language"</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-14-1.png" alt="" /><!-- --></p>
 
@@ -474,14 +453,13 @@
 
 <p>It’s also common to graph F1 over F2-F1, since it produces a plot more in tune with the IPA vowel trapezoid. We can add a new column to the data, with F2-F1 find the new hulls.</p>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">data</span><span class="o">$</span><span class="n">difference</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">data</span><span class="o">$</span><span class="nb">F</span><span class="m">2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">data</span><span class="o">$</span><span class="nb">F</span><span class="m">1</span><span class="w">
-</span><span class="n">lang_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ddply</span><span class="p">(</span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="nb">F</span><span class="m">1</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">language</span><span class="p">),</span><span class="w"> </span><span class="n">find_hull</span><span class="p">)</span><span class="w">
-</span></code></pre>
-</div>
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span><span class="o">$</span><span class="n">difference</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">data</span><span class="o">$</span><span class="n">F2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">data</span><span class="o">$</span><span class="n">F1</span><span class="w">
+</span><span class="n">lang_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ddply</span><span class="p">(</span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">F1</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">language</span><span class="p">),</span><span class="w"> </span><span class="n">find_hull</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
 
-<div class="language-r highlighter-rouge"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span><span class="o">+</span><span class="w">
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">geom_text</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">difference</span><span class="p">,</span><span class="w"> 
-                </span><span class="n">y</span><span class="o">=</span><span class="nb">F</span><span class="m">1</span><span class="p">,</span><span class="w"> 
+                </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
                 </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w">
                 </span><span class="n">color</span><span class="o">=</span><span class="n">language</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
   </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
@@ -490,15 +468,14 @@
        </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"F2 - F1"</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lang_hull</span><span class="p">,</span><span class="w">
                </span><span class="n">alpha</span><span class="o">=</span><span class="m">.2</span><span class="p">,</span><span class="w">
-               </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">difference</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">F</span><span class="m">1</span><span class="p">,</span><span class="w">
+               </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">difference</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F1</span><span class="p">,</span><span class="w">
                    </span><span class="n">fill</span><span class="o">=</span><span class="n">language</span><span class="p">,</span><span class="w">
                    </span><span class="n">color</span><span class="o">=</span><span class="n">language</span><span class="p">))</span><span class="o">+</span><span class="w">
   </span><span class="n">guides</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">scale_fill_manual</span><span class="p">(</span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"tomato2"</span><span class="p">,</span><span class="s2">"seagreen1"</span><span class="p">),</span><span class="w">
                     </span><span class="n">name</span><span class="o">=</span><span class="s2">"Language"</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">theme_bw</span><span class="p">()</span><span class="w">
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-16-1.png" alt="" /><!-- --></p>
 </div>
@@ -541,11 +518,23 @@
             
         
     
-
+        
+            
+        
+            
+        
     
+        
+            
+        
+            
+        
     
-
-    
+        
+            
+        
+            
+        
     
         
             
@@ -561,9 +550,6 @@
         
             
         
-    
-
-    
     
         
             
@@ -576,8 +562,8 @@
 
 <div class="PageNavigation">
   
-    <a class="prev pull-left" href="http://localhost:4000/2019/08/19/example.html">&laquo; Example</a>
   
+    <a class="next pull-right" href="http://localhost:4000/python/normalization/text/yamaha/music/bid/2019/11/13/python-group-regex.html">Normalizing Text with Regex Groups in Python &raquo;</a>
   
 </div>
 
@@ -604,7 +590,7 @@
           <div class="row">
             <div class="col-md-12 col-xs-12 footer">
               <footer>
-  © 2016 Your Name <a href="#">Privacy link</a> - Powered by Jekyll.
+  © 2019 Daniel Dorado <a href="/privacy">Privacy link</a> - Powered by Jekyll.
 </footer>
 <div align="center">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
