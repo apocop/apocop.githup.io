@@ -271,7 +271,6 @@ ggplot(data=data, aes(x=F2,
   scale_x_reverse()+
   scale_y_reverse()+
   labs(title="Daniel's English & Spanish Vowel Space")+
-  #theme(legend.position = "None")+
   geom_polygon(data=lang_hull, alpha=.4)+
   guides(color=FALSE)+
   scale_fill_discrete(name="Language")
