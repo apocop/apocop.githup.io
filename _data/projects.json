@@ -1,10 +1,10 @@
 [
 	{
-		"name": "Cool project 1",
-		"image": "placeholder.jpg",
-		"url": "#",
-		"date": "Jan 2014",
-		"tags": ["Angular JS","API"]
+		"name": "Al Bhed Translator",
+		"image": "translation.png",
+		"url": "/al-bhed-translator",
+		"date": "Jan 2019",
+		"tags": ["Python"]
 	},
 	{
 		"name": "Cool project 2",
