@@ -1,4 +1,4 @@
-I"¹„<h3 id="plotting-vowel-formants">Plotting Vowel Formants</h3>
+I"f„<h3 id="plotting-vowel-formants">Plotting Vowel Formants</h3>
 
 <p>In this tutorial, Iâ€™ll demonstrate how to create a basic vowel plot using the ggplot2 library in R.  Only the first two formants (F1 &amp; F2) will be plotted, since they are, in general, all thatâ€™s required to distinguish between most vowels.  <del>That and ggplot2 canâ€™t produce 3D graphics. ;)</del></p>
 
@@ -220,7 +220,6 @@
   </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
   </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
   </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Daniel's English &amp; Spanish Vowel Space"</span><span class="p">)</span><span class="o">+</span><span class="w">
-  </span><span class="c1">#theme(legend.position = "None")+</span><span class="w">
   </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lang_hull</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="o">=</span><span class="m">.4</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">guides</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="o">+</span><span class="w">
   </span><span class="n">scale_fill_discrete</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Language"</span><span class="p">)</span><span class="w">

@@ -6,7 +6,7 @@ date: "October 26, 2019"
 output:
   html_document:
     keep_md: true
-categories: R Formants
+categories: R phonology
 ---
 
 

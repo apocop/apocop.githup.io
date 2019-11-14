@@ -3,7 +3,7 @@ layout: post
 title: "Normalizing Text with Regex Groups in Python"
 author: "Daniel Dorado"
 date: "November 13, 2019"
-categories: Python Normalization text Yamaha music bid
+categories: python normalization text nlp regex
 ---
 
 In this post we're going to look at how regex groups can help clean messy text data, and in this specific case by normalizing product numbers.  The data examples come from [RFX]([http://www.sourcinginnovation.com/glossary/RFX.php) instrument bid data.  The challenge here is that while a company may have a concrete way of idenitfy their own products, these product IDs are commonly mistyped when customers request product. We'll see to fix common mistakes by a regular expression that matches all the erroneous forms and uses groups to pull out specific parts from the regex.

@@ -5,8 +5,8 @@
     <description>NLP Programming Blog</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 13 Nov 2019 19:54:05 -0800</pubDate>
-    <lastBuildDate>Wed, 13 Nov 2019 19:54:05 -0800</lastBuildDate>
+    <pubDate>Thu, 14 Nov 2019 07:36:46 -0800</pubDate>
+    <lastBuildDate>Thu, 14 Nov 2019 07:36:46 -0800</lastBuildDate>
     <generator>Jekyll v4.0.0</generator>
     
       <item>
@@ -324,21 +324,19 @@ YTR-2330    83.33%
 
 </description>
         <pubDate>Wed, 13 Nov 2019 00:00:00 -0800</pubDate>
-        <link>http://localhost:4000/python/normalization/text/yamaha/music/bid/2019/11/13/python-group-regex.html</link>
-        <guid isPermaLink="true">http://localhost:4000/python/normalization/text/yamaha/music/bid/2019/11/13/python-group-regex.html</guid>
+        <link>http://localhost:4000/python/normalization/text/nlp/regex/2019/11/13/python-group-regex.html</link>
+        <guid isPermaLink="true">http://localhost:4000/python/normalization/text/nlp/regex/2019/11/13/python-group-regex.html</guid>
         
         
-        <category>Python</category>
+        <category>python</category>
         
-        <category>Normalization</category>
+        <category>normalization</category>
         
         <category>text</category>
         
-        <category>Yamaha</category>
+        <category>nlp</category>
         
-        <category>music</category>
-        
-        <category>bid</category>
+        <category>regex</category>
         
       </item>
     
@@ -566,7 +564,6 @@ YTR-2330    83.33%
   &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scale_x_reverse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
   &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scale_y_reverse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
   &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;labs&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Daniel's English &amp;amp; Spanish Vowel Space&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
-  &lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;#theme(legend.position = &quot;None&quot;)+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
   &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;geom_polygon&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;lang_hull&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;alpha&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;.4&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
   &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;guides&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;FALSE&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
   &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;scale_fill_discrete&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Language&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
@@ -605,13 +602,13 @@ YTR-2330    83.33%
 &lt;p&gt;&lt;img src=&quot;/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-16-1.png&quot; alt=&quot;&quot; /&gt;&lt;!-- --&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 26 Oct 2019 00:00:00 -0700</pubDate>
-        <link>http://localhost:4000/r/formants/2019/10/26/creating-vowel-plots.html</link>
-        <guid isPermaLink="true">http://localhost:4000/r/formants/2019/10/26/creating-vowel-plots.html</guid>
+        <link>http://localhost:4000/r/phonology/2019/10/26/creating-vowel-plots.html</link>
+        <guid isPermaLink="true">http://localhost:4000/r/phonology/2019/10/26/creating-vowel-plots.html</guid>
         
         
         <category>R</category>
         
-        <category>Formants</category>
+        <category>phonology</category>
         
       </item>
     
