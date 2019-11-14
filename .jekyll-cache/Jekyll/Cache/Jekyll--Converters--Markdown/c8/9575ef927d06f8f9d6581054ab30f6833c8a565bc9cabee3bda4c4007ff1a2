@@ -1,0 +1,318 @@
+I"��<p>In this post we’re going to look at how regex groups can help clean messy text data, and in this specific case by normalizing product numbers.  The data examples come from <a href="[http://www.sourcinginnovation.com/glossary/RFX.php">RFX</a> instrument bid data.  The challenge here is that while a company may have a concrete way of idenitfy their own products, these product IDs are commonly mistyped when customers request product. We’ll see to fix common mistakes by a regular expression that matches all the erroneous forms and uses groups to pull out specific parts from the regex.</p>
+
+<h3 id="basic-yamaha-product-id">Basic Yamaha Product ID</h3>
+
+<p><a href="https://www.yamaha.com/en/">Yamaha</a>, the world’s largest instrument manufactuer, has designed a Product ID system which encodes descriptive information about the product.  Identifing the inherent morphology allows someone to know which instrument it is, but also any special customizations or features it may have. Luckily for us, we don’t need to know that.</p>
+
+<p>Let’s use the Yamaha Tuba, <a href="https://usa.yamaha.com/products/musical_instruments/winds/tubas/ybb-105/specs.html#product-tabs">YBB-105WC</a>, as our base example. For our purposes the pattern of the Yamaha wind instrument is:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Brand</th>
+      <th style="text-align: left">Instrument</th>
+      <th style="text-align: left">Hyphen</th>
+      <th style="text-align: left">Series</th>
+      <th style="text-align: left">Feates</th>
+      <th style="text-align: left">Mark/Iteration*</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">Y</td>
+      <td style="text-align: left">BB</td>
+      <td style="text-align: left">-</td>
+      <td style="text-align: left">105</td>
+      <td style="text-align: left">WC</td>
+      <td style="text-align: left">∅</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Yamaha</td>
+      <td style="text-align: left">Tuba</td>
+      <td style="text-align: left">delimiter</td>
+      <td style="text-align: left">100 Series</td>
+      <td style="text-align: left">With Case</td>
+      <td style="text-align: left">Product Iteration</td>
+    </tr>
+  </tbody>
+</table>
+
+<blockquote>
+  <p>The Mark or iteration is usally written with Roman Numerals, such as YAS-200AD<strong>II</strong>. No roman numerals means the product is the first iteration!</p>
+</blockquote>
+
+<p>Since we don’t need to pull out this level of detail from IDs in our example, we’ll reduce this template even further.</p>
+
+<p>Interestingly enough, this system was so successful that other companies took noticed and started following a similar approach. Note similarity between the Jupiter Tuba <a href="http://jupitermusic.com/us/products/brass/tubas/">JTU1110</a> and Eastman Tuba <a href="https://www.eastmanwinds.com/ebb234">EBB234</a>. Any guesses on what the first letter stands for?</p>
+
+<h3 id="examening-the-typos">Examening the typos</h3>
+
+<p>Let’s look at the typos we’ll be trying to normalize. Let’s look at the Yamaha Alto Sax <a href="https://usa.yamaha.com/products/musical_instruments/winds/saxophones/yas-200adii/index.html">YAS-200ADII</a>. This Product might be written a variety of ways such as:</p>
+
+<ul>
+  <li>yas200adii</li>
+  <li>yas 200</li>
+  <li>yas 200AD</li>
+  <li>yas - 200</li>
+  <li>yas - 200ADII</li>
+  <li>YAS200AD II</li>
+</ul>
+
+<p>And the list goes on.</p>
+
+<h3 id="goal">Goal</h3>
+
+<p>Our goal is to get all Yamaha product IDs into a canonical form reducing messy data and making them easier to work with.  We will not be correcting typos or incomplete IDs such as <strong>T</strong>FL-222 instead of YFL-222 or YAS-2<strong>80</strong> in place of YAS-200<strong>ADII</strong>. Let’s operationalize our normalized form. Ideally:</p>
+
+<ul>
+  <li>ALL CAPS</li>
+  <li>No spaces</li>
+  <li>Has delininating hyphen</li>
+  <li>Mark is optional</li>
+</ul>
+
+<p>This would mean that the previous list of error examples will all be canonicalized as YAS-200II and whichever mark such as ‘II’ or otherwise will only be included if it’s already listed. It’s absense will only be considered a typo.</p>
+
+<h3 id="libraries">Libraries</h3>
+
+<p>We’ll be using the <a href="https://docs.python.org/3.8/library/re.html">re library</a> for regular expressions.
+We’ll also be using the <code class="highlighter-rouge">Counter</code> object from <a href="https://docs.python.org/3.1/library/collections.html#collections.Counter">Collections</a> to manipulate the data easier and generate some statistics.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+</code></pre></div></div>
+
+<h3 id="python-regex-groups">Python Regex Groups</h3>
+
+<p>Part of the <code class="highlighter-rouge">re</code> library, groups allow you select and extract certain subpatterns of a regular expression. So we’ll pull out the germane parts of an ID and and normalize them to our standard form.</p>
+
+<p>The syntax of a group is simple:  (?P&lt;group_name&gt;…) where <strong>group_name</strong> is a name we choose for this group and the elipsis is the regex for the group.</p>
+
+<p>For example, let’s separate ‘Y’ from ‘FL’ in ‘YFL’. We assign ‘FYL’ to <code class="highlighter-rouge">string</code> and for our pattern we make two groups in one regular expression. One named <code class="highlighter-rouge">yamaha</code> and the other <code class="highlighter-rouge">instrument</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">string</span> <span class="o">=</span> <span class="s">'YFL'</span>
+<span class="n">pattern</span> <span class="o">=</span> <span class="s">'(?P&lt;yamaha&gt;y)(?P&lt;instrument&gt;[a-z]+)'</span>
+<span class="n">ex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>We can examen specific groups by using the <code class="highlighter-rouge">group()</code> method and pass it the group name as a string.  Please note that <code class="highlighter-rouge">re.match()</code> was passed the <code class="highlighter-rouge">re.IGNORECASE</code> flag so that the regex is case insensitive.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">ex</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">'yamaha'</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ex</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">'instrument'</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Y
+FL
+</code></pre></div></div>
+
+<p>Simple enough, now for something more complex. Let’s designed a regex that’ll encompass the various iterations of Yamaha product ID. We’re going to break it into 3 groups: <code class="highlighter-rouge">yamaha_instrument</code>, <code class="highlighter-rouge">series</code>, and <code class="highlighter-rouge">mark</code>.</p>
+
+<p>Note that the first group <code class="highlighter-rouge">yamaha_instrument</code> we’ll be conflating both the brand ‘Yamaha’ and ‘instrument since we don’t have a practical reason to distinguish them. <code class="highlighter-rouge">Series</code> will also conflate any [numeric]+[alpha]* pattern after the delimiter (that is hyphen in our canonical form). The group, <code class="highlighter-rouge">mark</code>, only will come to play if the the mark is separated by a space from the <code class="highlighter-rouge">series</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">yamaha_pattern</span> <span class="o">=</span> <span class="s">r'\b(?P&lt;yamaha_instrument&gt;Y[A-Z]{2})[\s-]*(?P&lt;series&gt;[0-9]+[A-Z]*)\s*(?P&lt;mark&gt;I*)\b'</span>
+
+<span class="n">products</span> <span class="o">=</span> <span class="p">[</span><span class="s">'YAS-200ADII'</span><span class="p">,</span> <span class="s">'YAS-200ADII'</span><span class="p">,</span> <span class="s">'YAS280'</span><span class="p">,</span> <span class="s">'YAS-200ADII'</span><span class="p">,</span> <span class="s">'YAS-200ADII'</span><span class="p">,</span> <span class="s">'YAS-200ADII'</span><span class="p">,</span> <span class="s">'YAS-200AD'</span><span class="p">,</span> <span class="s">'YAS200AD'</span><span class="p">,</span> <span class="s">'YAS-200ADII'</span><span class="p">,</span> <span class="s">'YAS-200ADII'</span><span class="p">,</span> <span class="s">'YAS-200ADII'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YAS26'</span><span class="p">,</span> <span class="s">'YAC1607'</span><span class="p">,</span> <span class="s">'YAS - 26'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YAS26'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YAS26'</span><span class="p">,</span> <span class="s">'YAS26'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YAS-480'</span><span class="p">,</span> <span class="s">'YAS - 480'</span><span class="p">,</span> <span class="s">'YAS-480'</span><span class="p">,</span> <span class="s">'YAS-480'</span><span class="p">,</span> <span class="s">'YAS-480'</span><span class="p">,</span> <span class="s">'YAS 480'</span><span class="p">,</span> <span class="s">'YAS-480'</span><span class="p">,</span> <span class="s">'YAS480'</span><span class="p">,</span> <span class="s">'YAS-480'</span><span class="p">,</span> <span class="s">'YAS480'</span><span class="p">,</span> <span class="s">'YAS480'</span><span class="p">,</span> <span class="s">'YAS-62III'</span><span class="p">,</span> <span class="s">'YAS 6211'</span><span class="p">,</span> <span class="s">'YAS-875EX'</span><span class="p">,</span> <span class="s">'yas-875EXll'</span><span class="p">,</span> <span class="s">'YAS-875EX'</span><span class="p">,</span> <span class="s">'YBB-105MWC'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB 105'</span><span class="p">,</span> <span class="s">'YBB105'</span><span class="p">,</span> <span class="s">'YBB - 105'</span><span class="p">,</span> <span class="s">'YBB105WC'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB105'</span><span class="p">,</span> <span class="s">'YBB-105'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB105WC'</span><span class="p">,</span> <span class="s">'YBB 105WC'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB-105Wc'</span><span class="p">,</span> <span class="s">'YBB105WC'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB105WC'</span><span class="p">,</span> <span class="s">'YBB105WC'</span><span class="p">,</span> <span class="s">'YBB105WC'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB105'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB 201MWC'</span><span class="p">,</span> <span class="s">'YBB-201WC'</span><span class="p">,</span> <span class="s">'YBB-201'</span><span class="p">,</span> <span class="s">'YBB201WC'</span><span class="p">,</span> <span class="s">'YBB-202MSWC'</span><span class="p">,</span> <span class="s">'YBB-202MSWC'</span><span class="p">,</span> <span class="s">'YBB-202MWC'</span><span class="p">,</span> <span class="s">'YBB-321'</span><span class="p">,</span> <span class="s">'YBB-321S'</span><span class="p">,</span> <span class="s">'YBB-321WC'</span><span class="p">,</span> <span class="s">'YBB321WC'</span><span class="p">,</span> <span class="s">'YBB-321'</span><span class="p">,</span> <span class="s">'YBB321WC'</span><span class="p">,</span> <span class="s">'YBB321WC'</span><span class="p">,</span> <span class="s">'YBB-321WC'</span><span class="p">,</span> <span class="s">'YBB-321wc'</span><span class="p">,</span> <span class="s">'YBB-321WC'</span><span class="p">,</span> <span class="s">'YBB-321'</span><span class="p">,</span> <span class="s">'YBB-321WC'</span><span class="p">,</span> <span class="s">'YBB-621'</span><span class="p">,</span> <span class="s">'YBB-641'</span><span class="p">,</span> <span class="s">'YBB-641WC'</span><span class="p">,</span> <span class="s">'YBB-641'</span><span class="p">,</span> <span class="s">'YBB641WC'</span><span class="p">,</span> <span class="s">'YBB-641'</span><span class="p">,</span> <span class="s">'YBB641'</span><span class="p">,</span> <span class="s">'YBB641'</span><span class="p">,</span> <span class="s">'YBH301M'</span><span class="p">,</span> <span class="s">'YBH-301M'</span><span class="p">,</span> <span class="s">'YBH301M'</span><span class="p">,</span> <span class="s">'YBH301M'</span><span class="p">,</span> <span class="s">'YBH301MS'</span><span class="p">,</span> <span class="s">'YBH-301MS'</span><span class="p">,</span> <span class="s">'YBH-301MS'</span><span class="p">,</span> <span class="s">'YBH-301MS'</span><span class="p">,</span> <span class="s">'YBH-301MS'</span><span class="p">,</span> <span class="s">'YBH301MS'</span><span class="p">,</span> <span class="s">'YBH301MS'</span><span class="p">,</span> <span class="s">'YBH 301'</span><span class="p">,</span> <span class="s">'YBH-301S'</span><span class="p">,</span> <span class="s">'YBH-301S'</span><span class="p">,</span> <span class="s">'YBH301S'</span><span class="p">,</span> <span class="s">'YBL-421G'</span><span class="p">,</span> <span class="s">'YSL421G'</span><span class="p">,</span> <span class="s">'YBL421G'</span><span class="p">,</span> <span class="s">'YBL421G'</span><span class="p">,</span> <span class="s">'YBL-620G'</span><span class="p">,</span> <span class="s">'YBL-620G'</span><span class="p">,</span> <span class="s">'YBL-620G'</span><span class="p">,</span> <span class="s">'YBL-613H'</span><span class="p">,</span> <span class="s">'YBL-620G'</span><span class="p">,</span> <span class="s">'YBL-830'</span><span class="p">,</span> <span class="s">'YBL-830'</span><span class="p">,</span> <span class="s">'YBL-830'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS 52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS52'</span><span class="p">,</span> <span class="s">'YBS52'</span><span class="p">,</span> <span class="s">'YBS52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS52'</span><span class="p">,</span> <span class="s">'YBS52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YBS62'</span><span class="p">,</span> <span class="s">'YBS-62'</span><span class="p">,</span> <span class="s">'YBS62'</span><span class="p">,</span> <span class="s">'YBS-62'</span><span class="p">,</span> <span class="s">'YBS62'</span><span class="p">,</span> <span class="s">'YBS-62'</span><span class="p">,</span> <span class="s">'YCL-200AD'</span><span class="p">,</span> <span class="s">'YCL-200ADII'</span><span class="p">,</span> <span class="s">'YCL-200ADII'</span><span class="p">,</span> <span class="s">'YCL-200ADII'</span><span class="p">,</span> <span class="s">'YCL-200ADII'</span><span class="p">,</span> <span class="s">'YCL-200ADII'</span><span class="p">,</span> <span class="s">'YCL-200AD'</span><span class="p">,</span> <span class="s">'YCL-20'</span><span class="p">,</span> <span class="s">'YCL200ADII'</span><span class="p">,</span> <span class="s">'YCL-200ADII'</span><span class="p">,</span> <span class="s">'YCL-200ADII'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YCL-221II'</span><span class="p">,</span> <span class="s">'YCL-221II'</span><span class="p">,</span> <span class="s">'YCL-221II'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YCL 221'</span><span class="p">,</span> <span class="s">'YCL 221'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YCL-221II'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YCL - 221'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YCL-221II'</span><span class="p">,</span> <span class="s">'YCL-221II'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YCL-221II'</span><span class="p">,</span> <span class="s">'YCL221II'</span><span class="p">,</span> <span class="s">'YCL211'</span><span class="p">,</span> <span class="s">'YCL221'</span><span class="p">,</span> <span class="s">'YCL221'</span><span class="p">,</span> <span class="s">'YCL-255'</span><span class="p">,</span> <span class="s">'YCL 255'</span><span class="p">,</span> <span class="s">'YCL-255'</span><span class="p">,</span> <span class="s">'YCL-255'</span><span class="p">,</span> <span class="s">'YCL-255'</span><span class="p">,</span> <span class="s">'YCL-255'</span><span class="p">,</span> <span class="s">'YCL255'</span><span class="p">,</span> <span class="s">'YCL-255'</span><span class="p">,</span> <span class="s">'YCL-250'</span><span class="p">,</span> <span class="s">'YCL255'</span><span class="p">,</span> <span class="s">'YCL255'</span><span class="p">,</span> <span class="s">'YCL255'</span><span class="p">,</span> <span class="s">'YCL255'</span><span class="p">,</span> <span class="s">'YCL-255'</span><span class="p">,</span> <span class="s">'YCL250'</span><span class="p">,</span> <span class="s">'YCL-400AD'</span><span class="p">,</span> <span class="s">'YCL - 450'</span><span class="p">,</span> <span class="s">'YCL-450'</span><span class="p">,</span> <span class="s">'YCL-450N'</span><span class="p">,</span> <span class="s">'YCL - 450N'</span><span class="p">,</span> <span class="s">'YCL450N'</span><span class="p">,</span> <span class="s">'YCL-621'</span><span class="p">,</span> <span class="s">'YCL-622'</span><span class="p">,</span> <span class="s">'YCL622II'</span><span class="p">,</span> <span class="s">'YCL-622ll'</span><span class="p">,</span> <span class="s">'YCL622II'</span><span class="p">,</span> <span class="s">'YCL-650'</span><span class="p">,</span> <span class="s">'YCL-650U'</span><span class="p">,</span> <span class="s">'YCL-681'</span><span class="p">,</span> <span class="s">'YCR-2330II'</span><span class="p">,</span> <span class="s">'YCR2330II'</span><span class="p">,</span> <span class="s">'YEP-201'</span><span class="p">,</span> <span class="s">'YEP 201'</span><span class="p">,</span> <span class="s">'YEP201'</span><span class="p">,</span> <span class="s">'YEP-201'</span><span class="p">,</span> <span class="s">'YEP - 201'</span><span class="p">,</span> <span class="s">'YEP-201'</span><span class="p">,</span> <span class="s">'YEP-201'</span><span class="p">,</span> <span class="s">'YEP201'</span><span class="p">,</span> <span class="s">'YEP201'</span><span class="p">,</span> <span class="s">'YEP-201'</span><span class="p">,</span> <span class="s">'YEP 201'</span><span class="p">,</span> <span class="s">'YEP201'</span><span class="p">,</span> <span class="s">'YEP-201'</span><span class="p">,</span> <span class="s">'YEP201'</span><span class="p">,</span> <span class="s">'YEP201'</span><span class="p">,</span> <span class="s">'YEP-201'</span><span class="p">,</span> <span class="s">'YEP-201M'</span><span class="p">,</span> <span class="s">'YEP201'</span><span class="p">,</span> <span class="s">'YEP 202'</span><span class="p">,</span> <span class="s">'YEP-202MS'</span><span class="p">,</span> <span class="s">'YEP 202MS'</span><span class="p">,</span> <span class="s">'YEP-202MS'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP321'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP321'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP321'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP321S'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP-321S'</span><span class="p">,</span> <span class="s">'YEP-321S'</span><span class="p">,</span> <span class="s">'YEP-3215'</span><span class="p">,</span> <span class="s">'YEP321S'</span><span class="p">,</span> <span class="s">'YEP-321S'</span><span class="p">,</span> <span class="s">'YEP321S'</span><span class="p">,</span> <span class="s">'YEP321'</span><span class="p">,</span> <span class="s">'YEP 321S'</span><span class="p">,</span> <span class="s">'YEP-642'</span><span class="p">,</span> <span class="s">'YEP-642SII'</span><span class="p">,</span> <span class="s">'YEP-642IIS'</span><span class="p">,</span> <span class="s">'YEP-642SII'</span><span class="p">,</span> <span class="s">'YEP-642SII'</span><span class="p">,</span> <span class="s">'YEP642S'</span><span class="p">,</span> <span class="s">'YFG-812'</span><span class="p">,</span> <span class="s">'YFH-631G'</span><span class="p">,</span> <span class="s">'YFH631G'</span><span class="p">,</span> <span class="s">'YFH-631G'</span><span class="p">,</span> <span class="s">'YFH--631G'</span><span class="p">,</span> <span class="s">'YFH-631G'</span><span class="p">,</span> <span class="s">'YFH631G'</span><span class="p">,</span> <span class="s">'YFH 2310'</span><span class="p">,</span> <span class="s">'YFH631G'</span><span class="p">,</span> <span class="s">'YFH-631G'</span><span class="p">,</span> <span class="s">'YFH-631GS'</span><span class="p">,</span> <span class="s">'YFH-631GS'</span><span class="p">,</span> <span class="s">'YFL-200AD'</span><span class="p">,</span> <span class="s">'YFL-200AD'</span><span class="p">,</span> <span class="s">'YFL-200AD'</span><span class="p">,</span> <span class="s">'YFL-200AD'</span><span class="p">,</span> <span class="s">'YFL-200ADII'</span><span class="p">,</span> <span class="s">'YFL-200AD'</span><span class="p">,</span> <span class="s">'YFL-200AD'</span><span class="p">,</span> <span class="s">'YFL-200AD'</span><span class="p">,</span> <span class="s">'YFL-221'</span><span class="p">,</span> <span class="s">'YFL221'</span><span class="p">,</span> <span class="s">'YFL-221'</span><span class="p">,</span> <span class="s">'YFL221'</span><span class="p">,</span> <span class="s">'YFL 222'</span><span class="p">,</span> <span class="s">'YFL-222'</span><span class="p">,</span> <span class="s">'YFL-222'</span><span class="p">,</span> <span class="s">'YFL-321P'</span><span class="p">,</span> <span class="s">'YFL-322'</span><span class="p">,</span> <span class="s">'YFL 361'</span><span class="p">,</span> <span class="s">'YFL 361'</span><span class="p">,</span> <span class="s">'YFL - 362'</span><span class="p">,</span> <span class="s">'YFL-381H'</span><span class="p">,</span> <span class="s">'YFL381H'</span><span class="p">,</span> <span class="s">'YFL-382Y'</span><span class="p">,</span> <span class="s">'YFL-382H'</span><span class="p">,</span> <span class="s">'YFL-382H'</span><span class="p">,</span> <span class="s">'YFL-461'</span><span class="p">,</span> <span class="s">'YFL-462H'</span><span class="p">,</span> <span class="s">'YFL-481H'</span><span class="p">,</span> <span class="s">'YFL-577HCT'</span><span class="p">,</span> <span class="s">'YFL-774HCT'</span><span class="p">,</span> <span class="s">'YHR-302M'</span><span class="p">,</span> <span class="s">'YHR - 31411'</span><span class="p">,</span> <span class="s">'YHR314'</span><span class="p">,</span> <span class="s">'YHR-314II'</span><span class="p">,</span> <span class="s">'YHR-314II'</span><span class="p">,</span> <span class="s">'YHR - 314'</span><span class="p">,</span> <span class="s">'YHR-312II'</span><span class="p">,</span> <span class="s">'YHR-314II'</span><span class="p">,</span> <span class="s">'YHR-314II'</span><span class="p">,</span> <span class="s">'YHR314'</span><span class="p">,</span> <span class="s">'YHR-567'</span><span class="p">,</span> <span class="s">'YHR-567'</span><span class="p">,</span> <span class="s">'YHR-567'</span><span class="p">,</span> <span class="s">'YHR-567'</span><span class="p">,</span> <span class="s">'YHR-567'</span><span class="p">,</span> <span class="s">'YHR-567'</span><span class="p">,</span> <span class="s">'YHR-567'</span><span class="p">,</span> <span class="s">'YHR-567'</span><span class="p">,</span> <span class="s">'YHR567'</span><span class="p">,</span> <span class="s">'YHR-567'</span><span class="p">,</span> <span class="s">'YHR567D'</span><span class="p">,</span> <span class="s">'YHR-667'</span><span class="p">,</span> <span class="s">'YHR667'</span><span class="p">,</span> <span class="s">'YHR667'</span><span class="p">,</span> <span class="s">'YHR668DII'</span><span class="p">,</span> <span class="s">'YHR-668NII'</span><span class="p">,</span> <span class="s">'YMP-204M'</span><span class="p">,</span> <span class="s">'YMP204M'</span><span class="p">,</span> <span class="s">'YMP204MS'</span><span class="p">,</span> <span class="s">'YMP-204MS'</span><span class="p">,</span> <span class="s">'YMP-204S'</span><span class="p">,</span> <span class="s">'YMP-204MS'</span><span class="p">,</span> <span class="s">'YMP204MS'</span><span class="p">,</span> <span class="s">'YMP204MS'</span><span class="p">,</span> <span class="s">'YOB-241'</span><span class="p">,</span> <span class="s">'YOB-241'</span><span class="p">,</span> <span class="s">'YOB-241'</span><span class="p">,</span> <span class="s">'YOB-241'</span><span class="p">,</span> <span class="s">'YOB-241'</span><span class="p">,</span> <span class="s">'YOB-241'</span><span class="p">,</span> <span class="s">'YOB-241'</span><span class="p">,</span> <span class="s">'YOB-441'</span><span class="p">,</span> <span class="s">'YOB-441'</span><span class="p">,</span> <span class="s">'YOB-441'</span><span class="p">,</span> <span class="s">'YOB441'</span><span class="p">,</span> <span class="s">'YOB-441A'</span><span class="p">,</span> <span class="s">'YOB441M'</span><span class="p">,</span> <span class="s">'YOB-441M'</span><span class="p">,</span> <span class="s">'YPC-32'</span><span class="p">,</span> <span class="s">'YPC-32'</span><span class="p">,</span> <span class="s">'YPC-32'</span><span class="p">,</span> <span class="s">'YPC-32'</span><span class="p">,</span> <span class="s">'YPC-32'</span><span class="p">,</span> <span class="s">'YPC-32'</span><span class="p">,</span> <span class="s">'YPC-32'</span><span class="p">,</span> <span class="s">'YPC-32'</span><span class="p">,</span> <span class="s">'YPC32'</span><span class="p">,</span> <span class="s">'YPC-62'</span><span class="p">,</span> <span class="s">'YPC-62'</span><span class="p">,</span> <span class="s">'YPC62'</span><span class="p">,</span> <span class="s">'YPC62'</span><span class="p">,</span> <span class="s">'YPC-62'</span><span class="p">,</span> <span class="s">'YPC-62R'</span><span class="p">,</span> <span class="s">'YPC-62R'</span><span class="p">,</span> <span class="s">'YPC-81'</span><span class="p">,</span> <span class="s">'YPC82'</span><span class="p">,</span> <span class="s">'YSH 301'</span><span class="p">,</span> <span class="s">'YSH301WC'</span><span class="p">,</span> <span class="s">'YSH-411'</span><span class="p">,</span> <span class="s">'YSH-411'</span><span class="p">,</span> <span class="s">'Ysh411S'</span><span class="p">,</span> <span class="s">'YSH411'</span><span class="p">,</span> <span class="s">'YSH-411'</span><span class="p">,</span> <span class="s">'YSH411'</span><span class="p">,</span> <span class="s">'YSH411S'</span><span class="p">,</span> <span class="s">'YSH-411SWC'</span><span class="p">,</span> <span class="s">'YSH411S'</span><span class="p">,</span> <span class="s">'YSH441swc'</span><span class="p">,</span> <span class="s">'YSH411'</span><span class="p">,</span> <span class="s">'YSH-411WC'</span><span class="p">,</span> <span class="s">'YSH411'</span><span class="p">,</span> <span class="s">'YSH-411WC'</span><span class="p">,</span> <span class="s">'YSH411WC'</span><span class="p">,</span> <span class="s">'YSH411'</span><span class="p">,</span> <span class="s">'YSL-200AD'</span><span class="p">,</span> <span class="s">'YSL-200AD'</span><span class="p">,</span> <span class="s">'YSL-200AD'</span><span class="p">,</span> <span class="s">'YSL-200AD'</span><span class="p">,</span> <span class="s">'YSL-200AD'</span><span class="p">,</span> <span class="s">'YSL-200AD'</span><span class="p">,</span> <span class="s">'YSL-354'</span><span class="p">,</span> <span class="s">'YSL-354'</span><span class="p">,</span> <span class="s">'YSL 354'</span><span class="p">,</span> <span class="s">'YSL354'</span><span class="p">,</span> <span class="s">'YSL354'</span><span class="p">,</span> <span class="s">'YSL-354'</span><span class="p">,</span> <span class="s">'YSL-354'</span><span class="p">,</span> <span class="s">'YSL354'</span><span class="p">,</span> <span class="s">'YSL-354C'</span><span class="p">,</span> <span class="s">'YSL354'</span><span class="p">,</span> <span class="s">'YSL354'</span><span class="p">,</span> <span class="s">'YSL-446G'</span><span class="p">,</span> <span class="s">'YSL-446G'</span><span class="p">,</span> <span class="s">'YSL-447G'</span><span class="p">,</span> <span class="s">'YSL-447G'</span><span class="p">,</span> <span class="s">'YSL-448G'</span><span class="p">,</span> <span class="s">'YSL-448G'</span><span class="p">,</span> <span class="s">'YSL 448G'</span><span class="p">,</span> <span class="s">'YSL-448G'</span><span class="p">,</span> <span class="s">'YSL448G'</span><span class="p">,</span> <span class="s">'YSL3448G'</span><span class="p">,</span> <span class="s">'YSL-448G'</span><span class="p">,</span> <span class="s">'YSL-446G'</span><span class="p">,</span> <span class="s">'YSL-620'</span><span class="p">,</span> <span class="s">'YSL-8820'</span><span class="p">,</span> <span class="s">'YSL-8820'</span><span class="p">,</span> <span class="s">'YSL-882O'</span><span class="p">,</span> <span class="s">'YSL882O'</span><span class="p">,</span> <span class="s">'YSS-475II'</span><span class="p">,</span> <span class="s">'YSS-475II'</span><span class="p">,</span> <span class="s">'YSS-475'</span><span class="p">,</span> <span class="s">'YSS475'</span><span class="p">,</span> <span class="s">'YSS475'</span><span class="p">,</span> <span class="s">'YSS475II'</span><span class="p">,</span> <span class="s">'YSS475'</span><span class="p">,</span> <span class="s">'YSS-875EX'</span><span class="p">,</span> <span class="s">'YSS-875EXHG'</span><span class="p">,</span> <span class="s">'YTR-200ADII'</span><span class="p">,</span> <span class="s">'YTR-200ADII'</span><span class="p">,</span> <span class="s">'YTR-200ADII'</span><span class="p">,</span> <span class="s">'YTR-200ADII'</span><span class="p">,</span> <span class="s">'YTR-200ADII'</span><span class="p">,</span> <span class="s">'YTR-200AD'</span><span class="p">,</span> <span class="s">'YTR200AD'</span><span class="p">,</span> <span class="s">'YTR-200ADII'</span><span class="p">,</span> <span class="s">'YTR-200ADII'</span><span class="p">,</span> <span class="s">'YTR-2330'</span><span class="p">,</span> <span class="s">'YTR-2330'</span><span class="p">,</span> <span class="s">'YTR-2330'</span><span class="p">,</span> <span class="s">'YTR 2330'</span><span class="p">,</span> <span class="s">'YTR2330'</span><span class="p">,</span> <span class="s">'YTR-2330'</span><span class="p">,</span> <span class="s">'YTR 2335'</span><span class="p">,</span> <span class="s">'YTR 2330'</span><span class="p">,</span> <span class="s">'YTR2330'</span><span class="p">,</span> <span class="s">'YTR-2330'</span><span class="p">,</span> <span class="s">'YTR2330'</span><span class="p">,</span> <span class="s">'YTR233'</span><span class="p">,</span> <span class="s">'YTR 2335'</span><span class="p">,</span> <span class="s">'YTR-2330'</span><span class="p">,</span> <span class="s">'YTR-300AD'</span><span class="p">,</span> <span class="s">'YTR 433'</span><span class="p">,</span> <span class="s">'YTR4335'</span><span class="p">,</span> <span class="s">'YTR-4335GII'</span><span class="p">,</span> <span class="s">'YTR-4335GSii'</span><span class="p">,</span> <span class="s">'YTR-4335GS'</span><span class="p">,</span> <span class="s">'YTR8335S'</span><span class="p">,</span> <span class="s">'YTR-8335S'</span><span class="p">,</span> <span class="s">'YTR-8335IIS'</span><span class="p">,</span> <span class="s">'YTR-8335'</span><span class="p">,</span> <span class="s">'YTR8335S'</span><span class="p">,</span> <span class="s">'YTS 200AD'</span><span class="p">,</span> <span class="s">'YTS-200ADII'</span><span class="p">,</span> <span class="s">'YTS-200ADII'</span><span class="p">,</span> <span class="s">'YTS-200ADII'</span><span class="p">,</span> <span class="s">'YTS-200AD'</span><span class="p">,</span> <span class="s">'YTS-200ADII'</span><span class="p">,</span> <span class="s">'YTS-200ADII'</span><span class="p">,</span> <span class="s">'YTS26'</span><span class="p">,</span> <span class="s">'YTS-26'</span><span class="p">,</span> <span class="s">'YTS23'</span><span class="p">,</span> <span class="s">'YTS26'</span><span class="p">,</span> <span class="s">'YTS-26'</span><span class="p">,</span> <span class="s">'YTS26'</span><span class="p">,</span> <span class="s">'YTS26'</span><span class="p">,</span> <span class="s">'YTS-26'</span><span class="p">,</span> <span class="s">'YTS-26C'</span><span class="p">,</span> <span class="s">'YTS26'</span><span class="p">,</span> <span class="s">'YTS-480'</span><span class="p">,</span> <span class="s">'YTS - 480'</span><span class="p">,</span> <span class="s">'YTS-480'</span><span class="p">,</span> <span class="s">'YTS - 480'</span><span class="p">,</span> <span class="s">'YTS 480'</span><span class="p">,</span> <span class="s">'YTS-480'</span><span class="p">,</span> <span class="s">'YTY475'</span><span class="p">,</span> <span class="s">'YTS475'</span><span class="p">,</span> <span class="s">'YTS-480'</span><span class="p">,</span> <span class="s">'YTS-480'</span><span class="p">,</span> <span class="s">'YTS480'</span><span class="p">,</span> <span class="s">'YTS480'</span><span class="p">,</span> <span class="s">'YTS480'</span><span class="p">,</span> <span class="s">'YTS-480'</span><span class="p">,</span> <span class="s">'YTS-480'</span><span class="p">,</span> <span class="s">'YTS-480'</span><span class="p">,</span> <span class="s">'YTS-62II'</span><span class="p">,</span> <span class="s">'YTS-62'</span><span class="p">,</span> <span class="s">'YTS-62III'</span><span class="p">,</span> <span class="s">'YTS62'</span><span class="p">,</span> <span class="s">'YTS62'</span><span class="p">,</span> <span class="s">'YTS6211'</span><span class="p">,</span> <span class="s">'YTS-62SIII'</span><span class="p">,</span> <span class="s">'YTS-82ZII'</span><span class="p">,</span> <span class="s">'YFL-222'</span><span class="p">,</span> <span class="s">'YFL-362H'</span><span class="p">,</span> <span class="s">'YFL-482H'</span><span class="p">,</span> <span class="s">'YCL-621'</span><span class="p">,</span> <span class="s">'YAS-875EXII'</span><span class="p">,</span> <span class="s">'YHR-671'</span><span class="p">,</span> <span class="s">'YSL-882GO'</span><span class="p">,</span> <span class="s">'YPC62'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YEP-201'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YFL-222'</span><span class="p">,</span> <span class="s">'YTS-480'</span><span class="p">,</span> <span class="s">'YCL-255Y'</span><span class="p">,</span> <span class="s">'YCL-255'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YCL-450N'</span><span class="p">,</span> <span class="s">'YAS - 480SY'</span><span class="p">,</span> <span class="s">'YTS-480'</span><span class="p">,</span> <span class="s">'YTR-8335RS'</span><span class="p">,</span> <span class="s">'YEP-211'</span><span class="p">,</span> <span class="s">'YBB-321'</span><span class="p">,</span> <span class="s">'YBB-105MWC'</span><span class="p">,</span> <span class="s">'YBB-321WC'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YEP-201'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YTS-480'</span><span class="p">,</span> <span class="s">'YAS-480C'</span><span class="p">,</span> <span class="s">'YPC-62'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YTS-475'</span><span class="p">,</span> <span class="s">'YAS-26'</span><span class="p">,</span> <span class="s">'YCL-255'</span><span class="p">,</span> <span class="s">'YEP-201'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YPC-32'</span><span class="p">,</span> <span class="s">'YTS-26'</span><span class="p">,</span> <span class="s">'YSL-448G'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YCL-221'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YCL-450N'</span><span class="p">,</span> <span class="s">'YEP-321'</span><span class="p">,</span> <span class="s">'YAS-480'</span><span class="p">,</span> <span class="s">'YTR-8310ZZ'</span><span class="p">,</span> <span class="s">'YEP-202M'</span><span class="p">,</span> <span class="s">'YEP-321S'</span><span class="p">,</span> <span class="s">'YEP3215'</span><span class="p">,</span> <span class="s">'YBS52'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YFL-361'</span><span class="p">,</span> <span class="s">'YBB-105WC'</span><span class="p">,</span> <span class="s">'YBS-52'</span><span class="p">,</span> <span class="s">'YAS 662'</span><span class="p">,</span> <span class="s">'YAS-480'</span><span class="p">,</span> <span class="s">'YBH-301M'</span><span class="p">,</span> <span class="s">'YEP-202M'</span><span class="p">,</span> <span class="s">'YMP-204M'</span><span class="p">,</span> <span class="s">'YSH-411'</span><span class="p">,</span> <span class="s">'YMP-204M'</span><span class="p">,</span> <span class="s">'YBH-301M'</span><span class="p">,</span> <span class="s">'YEP201'</span><span class="p">,</span> <span class="s">'ybb321wc'</span><span class="p">,</span> <span class="s">'ysl-448g'</span><span class="p">,</span> <span class="s">'yts875ex'</span><span class="p">,</span> <span class="s">'YMP-204M'</span><span class="p">,</span> <span class="s">'YBH-301M'</span><span class="p">,</span> <span class="s">'YAS-62III'</span><span class="p">,</span> <span class="s">'YBS-62'</span><span class="p">,</span> <span class="s">'YEP-642II'</span><span class="p">,</span> <span class="s">'YSL-448G'</span><span class="p">,</span> <span class="s">'YFL462HY'</span><span class="p">,</span> <span class="s">'YOB-441'</span><span class="p">,</span> <span class="s">'YHR668NII'</span><span class="p">,</span> <span class="s">'YOB841'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>The Table below describes this regex chunch by chunck. For a more thorough regex review, consult the <a href="https://docs.python.org/3.8/library/re.html">re documentation</a>. Notice</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Regex component</th>
+      <th style="text-align: left">Explaination</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">\b</td>
+      <td style="text-align: left">word boundry</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">(?P&lt;yamaha_instrument&gt;Y[A-Z]{2})</td>
+      <td style="text-align: left">a group name <strong>yamaha_instrument</strong> that consists of a y followed by two other alphabetic characters</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">[\s-]*</td>
+      <td style="text-align: left">zero or more spaces or hyphens in any order</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">(?P&lt;series&gt;[0-9]+[A-Z]*)</td>
+      <td style="text-align: left">a group named <strong>series</strong> which can consist one or more numbers followed by zero or more alphabetic characters</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">\s*</td>
+      <td style="text-align: left">zero or more spaces</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">(?P&lt;mark&gt;I*)</td>
+      <td style="text-align: left">named group called <strong>mark</strong> which consists of zero or more i’s</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">\b’</td>
+      <td style="text-align: left">word boundry</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><code class="highlighter-rouge">product</code> is a list of various Yamaha product IDs.  The data comes from RFX data which can be found <a href="https://github.com/apocop/normalizers/blob/master/musicbid/data.txt">here</a>.  To reduce the complexity of this post, I took some IDs from the data rather than extracting it from the raw.</p>
+
+<p>Now that we have a regex that will separate all these product IDs, we’ll create a function that takes a product id and normalizes it.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">normalize_yamaha_product_id</span><span class="p">(</span><span class="n">product</span><span class="p">,</span> <span class="n">pattern</span><span class="p">):</span>
+    <span class="s">'Return idealized form of Yamaha product ID'</span>
+    <span class="n">product_id</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">product</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+    
+    <span class="c1"># The three groups.
+</span>    <span class="n">yamaha_instrument</span> <span class="o">=</span> <span class="n">product_id</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">'yamaha_instrument'</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="n">series</span> <span class="o">=</span> <span class="n">product_id</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">'series'</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    <span class="n">mark</span> <span class="o">=</span> <span class="n">product_id</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s">'mark'</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+    
+    <span class="c1"># Put extracted groups into final normalized form.
+</span>    <span class="k">return</span> <span class="n">f</span><span class="s">'{ yamaha_instrument}-{series}{mark}'</span>
+</code></pre></div></div>
+
+<p>Let’s test our function and make sure it preforms well. With these basic tests it seems to work well. Be sure to mess around with your own test case, and try to make it fail.  What happens, for example, if you have ‘yas - 200 ADII’?</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Test: (input, correct_ouput)
+</span><span class="n">test</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span><span class="s">'yas200adii'</span><span class="p">,</span> <span class="s">'YAS-200ADII'</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">'yas 200'</span><span class="p">,</span> <span class="s">'YAS-200'</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">'yas 200AD'</span><span class="p">,</span> <span class="s">'YAS-200AD'</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">'yas - 200ADII'</span><span class="p">,</span> <span class="s">'YAS-200ADII'</span><span class="p">),</span>
+    <span class="p">(</span><span class="s">'YAS200AD II'</span><span class="p">,</span> <span class="s">'YAS-200ADII'</span><span class="p">)</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="nb">input</span><span class="p">,</span> <span class="n">output</span> <span class="ow">in</span> <span class="n">test</span><span class="p">:</span>
+    <span class="n">test_case</span> <span class="o">=</span> <span class="n">normalize_yamaha_product_id</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="n">yamaha_pattern</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">test_case</span> <span class="o">==</span> <span class="n">output</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'Pass'</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'Fail: "{test_case}" is not equal to "{output}'</span><span class="p">)</span>
+
+    
+
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Pass
+Pass
+Pass
+Pass
+Pass
+</code></pre></div></div>
+
+<p>Everything passed! Now that we have tested our function and know it works.  Let’s use it to normalize the IDs in <code class="highlighter-rouge">products</code>. We initialize a <code class="highlighter-rouge">Counter</code> object with <code class="highlighter-rouge">products</code>.  This gives us an object where we can easily get the unique IDs and counts  the various instances each individual ID. Let’s normalize just the unique IDs.  The ‘Change’ column is <em>True</em> if the input is different than the output and <em>False</em> if there is no difference.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">products</span><span class="p">)</span>
+
+<span class="c1"># Some statitics.
+</span><span class="n">total_changes</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'No.</span><span class="se">\t</span><span class="s">Original</span><span class="se">\t</span><span class="s">Normalized</span><span class="se">\t</span><span class="s">Change'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">normalized_product</span> <span class="o">=</span> <span class="n">normalize_yamaha_product_id</span><span class="p">(</span><span class="n">product</span><span class="p">,</span> <span class="n">yamaha_pattern</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">product</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">normalized_product</span><span class="p">:</span>
+        <span class="n">change</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">change</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">total_changes</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'{counter}</span><span class="se">\t</span><span class="s">{product.ljust(10)}</span><span class="se">\t</span><span class="s">{normalized_product.ljust(10)}</span><span class="se">\t</span><span class="s">{change}'</span><span class="p">)</span>  
+
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>No.	Original	Normalized	Change
+1	YAS-200ADII	YAS-200ADII	False
+2	YAS280    	YAS-280   	True
+3	YAS-200AD 	YAS-200AD 	False
+4	YAS200AD  	YAS-200AD 	True
+5	YAS-26    	YAS-26    	False
+6	YAS26     	YAS-26    	True
+...
+253	YEP-642II 	YEP-642II 	False
+254	YFL462HY  	YFL-462HY 	True
+255	YHR668NII 	YHR-668NII	True
+256	YOB841    	YOB-841   	True
+</code></pre></div></div>
+
+<p>Feel free to look through the results. It appears that the function is working as intended.</p>
+
+<h3 id="analysis">Analysis</h3>
+
+<p>Let’s examen how this function changed the data. For comparison we’ll also create a new <code class="highlighter-rouge">Counter</code> with the normalized forms.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">normalized_data</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">([</span><span class="n">normalize_yamaha_product_id</span><span class="p">(</span><span class="n">product</span><span class="p">,</span> <span class="n">yamaha_pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">product</span> <span class="ow">in</span> <span class="n">products</span><span class="p">])</span>
+
+<span class="n">num_of_products</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+<span class="n">num_of_uniq_products</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">normalized_data</span><span class="p">))</span>
+
+<span class="n">percentage_decrease</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">num_of_products</span> <span class="o">-</span> <span class="n">num_of_uniq_products</span><span class="p">)</span> <span class="o">/</span> <span class="n">num_of_products</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'{num_of_products} unique IDs was reduced to {num_of_uniq_products} IDs'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'That</span><span class="se">\'</span><span class="s">s a decrease of {percentage_decrease}</span><span class="si">%</span><span class="s">!'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>256 unique IDs was reduced to 173 IDs
+That's a decrease of 32.42%!
+</code></pre></div></div>
+
+<p>We can make a table comparing the top 10 Product Numbers before normalization and after normalization.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">heading</span> <span class="o">=</span> <span class="s">'Old'</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">+</span> <span class="s">'No.'</span> <span class="o">+</span> <span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="o">+</span> <span class="s">'New'</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">+</span> <span class="s">'No.'</span>
+<span class="k">print</span><span class="p">(</span><span class="n">heading</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'-'</span><span class="o">*</span><span class="mi">30</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">num</span><span class="p">,</span> <span class="n">pair</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">normalized_data</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">10</span><span class="p">))):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'{pair[0][0].ljust(10)}{pair[0][1]}</span><span class="se">\t</span><span class="s">{pair[1][0].ljust(10)}{pair[1][1]}'</span><span class="p">)</span>
+    
+
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Old       No.	New       No.
+------------------------------
+YBS-52    20	YBS-52    31
+YBB-105WC 16	YBB-105WC 24
+YEP-321   16	YEP-201   21
+YCL-221   14	YEP-321   20
+YAS-26    12	YCL-221   19
+YTS-480   11	YAS-26    17
+YBS52     10	YTS-480   17
+YEP-201   10	YCL-255   15
+YCL-255   9	YAS-480   13
+YHR-567   9	YTR-2330  11
+</code></pre></div></div>
+
+<p>From the table we can see that the YBS-52 is still the most common item requested, and that ‘YBS52’ has been removed from the list.  As a few other items such as the YCL-255 and YHR-576 were removed from the Top 10, this new Top 10 list provides more accurate insights.</p>
+
+<p>Now let’s look at the percentage increases of the Top 10 items. To get the percentage change:</p>
+
+<script type="math/tex; mode=display">\frac{\text{new number} - \text{old number}}{\text{old number}} \times{100}</script>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">'Product ID'</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">11</span><span class="p">),</span> <span class="s">'Percentage Change'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'-'</span><span class="o">*</span><span class="mi">30</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">product</span><span class="p">,</span> <span class="n">new_count</span> <span class="ow">in</span> <span class="n">normalized_data</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">old_count</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">product</span><span class="p">]</span>
+    <span class="n">percentage_increase</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">new_count</span> <span class="o">-</span> <span class="n">old_count</span><span class="p">)</span> <span class="o">/</span> <span class="n">old_count</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s">'{product.ljust(12)}{percentage_increase}</span><span class="si">%</span><span class="s">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Product ID  Percentage Change
+------------------------------
+YBS-52      55.0%
+YBB-105WC   50.0%
+YEP-201     110.0%
+YEP-321     25.0%
+YCL-221     35.71%
+YAS-26      41.67%
+YTS-480     54.55%
+YCL-255     66.67%
+YAS-480     62.5%
+YTR-2330    83.33%
+</code></pre></div></div>
+
+<p>We can see that the new top products all received significant count increases.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>In this post we saw how we could extract substrings using regular expression, and how we could use them to clean up messy data.</p>
+
+:ET
