@@ -8,7 +8,7 @@ about: Linguist
 # baseurl: "www.nlpnotebook.com"
 url: "https://github.com/apocop/apocop.github.io"
 
-allowsearch: true
+allowsearch: False
 
 # disqus_shortname: aboutashu
 # google_analytics: UA-72862926-1
