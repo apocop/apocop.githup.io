@@ -1,0 +1,259 @@
+I"f�<h3 id="plotting-vowel-formants">Plotting Vowel Formants</h3>
+
+<p>In this tutorial, I’ll demonstrate how to create a basic vowel plot using the ggplot2 library in R.  Only the first two formants (F1 &amp; F2) will be plotted, since they are, in general, all that’s required to distinguish between most vowels.  <del>That and ggplot2 can’t produce 3D graphics. ;)</del></p>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<p>I’m going to assume you already have an R environment set up and ready to go, along with some basic experience with R. Yet, even if you’re new to R, this post shouldn’t be too difficult to plod through… especially if you cut and paste.</p>
+
+<p>Also, since this particular post is about vowel formants, some phonetic knowledge is required if– say you want to gather your own data or understand what exactly is being plotted here.</p>
+
+<h3 id="the-data">The Data</h3>
+
+<p>For the sample data, I recorded myself saying a few words in Praat, both in English and Spanish so that the the vowels from the differing language could be plotted one against the other. I coded the measurements using Excel.  While this isn’t a scientific study, and nothing will be gleaned from using such little data, the plots will be interesting to gawk at.</p>
+
+<h2 id="r-libraries">R Libraries</h2>
+
+<p>First things first, import ggplot2 and plyr.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">library</span><span class="p">(</span><span class="s1">'ggplot2'</span><span class="p">)</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="s1">'plyr'</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="import-the-data">Import the Data</h3>
+
+<p>I suggest you take a take a look at the CSV file before you view the summary in R.  Since the labels we’ll be using to represent the vowels are from the International Phonetic Alphabet (IPA), the encoding has to be set to UTF-8, otherwise R will not recognize the special characters, and they will be distorted when you plot them.  Here we use the <code class="highlighter-rouge">read.delim</code> function to import the CSV into R as a data-frame.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">read.delim</span><span class="p">(</span><span class="s1">'vowels.csv'</span><span class="p">,</span><span class="w">
+               </span><span class="n">header</span><span class="o">=</span><span class="m">1</span><span class="p">,</span><span class="w">
+               </span><span class="n">sep</span><span class="o">=</span><span class="s2">","</span><span class="p">,</span><span class="w">
+               </span><span class="n">encoding</span><span class="o">=</span><span class="s2">"UTF-8"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Let’s review the data. Print data to the console and you’ll see a small data-set of 13 observations.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##    X.U.FEFF.words  F1   F2    vowel language
+## 1            heed 261 2049        i  English
+## 2             hid 388 1947 &lt;U+026A&gt;  English
+## 3            head 439 1896 &lt;U+025B&gt;  English
+## 4             had 577 1769        æ  English
+## 5             hod 694 1141 &lt;U+0251&gt;  English
+## 6           hawed 589  785 &lt;U+0254&gt;  English
+## 7            hood 312 1303 &lt;U+028A&gt;  English
+## 8           who'd 312  980        u  English
+## 9             hut 568 1170 &lt;U+028C&gt;  English
+## 10           hito 255 2090        i  Spanish
+## 11          hecho 420 2035        e  Spanish
+## 12          hache 711 1561        a  Spanish
+## 13           ocho 433  795        o  Spanish
+## 14           hube 346  680        u  Spanish
+</code></pre></div></div>
+
+<h3 id="a-sidenote-regarding-excel">A Sidenote Regarding Excel.</h3>
+<p>Unfortunately, When Excel generates a file in UTF-8, “<strong>X.U.FEFF.</strong>”, is prepended to the file  This explains the strange name for the first column, X.U.FEFF.words. It doesn’t really cause a problem, but being ugly, and awkward to remember and type, we rename the column to <em>words</em> as it was intended.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">colnames</span><span class="p">(</span><span class="n">data</span><span class="p">)[</span><span class="m">1</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s2">"words"</span><span class="w">
+</span><span class="n">data</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##    words  F1   F2    vowel language
+## 1   heed 261 2049        i  English
+## 2    hid 388 1947 &lt;U+026A&gt;  English
+## 3   head 439 1896 &lt;U+025B&gt;  English
+## 4    had 577 1769        æ  English
+## 5    hod 694 1141 &lt;U+0251&gt;  English
+## 6  hawed 589  785 &lt;U+0254&gt;  English
+## 7   hood 312 1303 &lt;U+028A&gt;  English
+## 8  who'd 312  980        u  English
+## 9    hut 568 1170 &lt;U+028C&gt;  English
+## 10  hito 255 2090        i  Spanish
+## 11 hecho 420 2035        e  Spanish
+## 12 hache 711 1561        a  Spanish
+## 13  ocho 433  795        o  Spanish
+## 14  hube 346  680        u  Spanish
+</code></pre></div></div>
+
+<p>Here we’re going to subset the data-frame into two separate variables so that we can work with either language individually.  We’ll continue with English for the moment.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">eng</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="o">$</span><span class="n">language</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"English"</span><span class="p">)</span><span class="w">
+</span><span class="n">spa</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="o">$</span><span class="n">language</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s2">"Spanish"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="a-basic-plot">A Basic Plot</h3>
+
+<p>A basic plot in ggplot2 isn’t too difficult to create.  Every plot requires three components:</p>
+
+<ol>
+  <li>data – the data-frame</li>
+  <li>aesthetic mappings – connects data to the layer</li>
+  <li>layer – the type of graph</li>
+</ol>
+
+<p>Our data-frame, <em>eng</em>, is directly passed to the <code class="highlighter-rouge">ggplot</code> function. It will be mapped by <code class="highlighter-rouge">aes()</code> the to visual properties in the graph (the layer). Lastly, the layer is usually created with a geom function.  The layer can be thought of as the type of graph, such a bar chart or scatter plot. A simple scatter plot can be created with <code class="highlighter-rouge">geom_point()</code>. Below, the three elements are given their own line in the same order.</p>
+
+<blockquote>
+  <p>Unique to ggplot2, the plus sign (+) allows you to <em>add</em> plot components together.</p>
+</blockquote>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_point</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-6-1.png" alt="" /></p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># A more idomatic example of the above code.</span><span class="w">
+
+</span><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">))</span><span class="o">+</span><span class="w">
+</span><span class="n">geom_point</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Rather than points representing each vowel, let’s arrange it so that the IPA symbol is plotted.  Replace <code class="highlighter-rouge">geom_point</code> with <code class="highlighter-rouge">geom_text</code>.  Inside <code class="highlighter-rouge">aes()</code> include the new argument, <em>label</em>, which we’ll asign the vowel column in our data-frame, <em>eng</em>.  Let’s also pass the color attribute.  By assigning the vowel column to color, ggplot2 will automatically assign a color to each of our labels.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
+                     </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w"> 
+                     </span><span class="n">color</span><span class="o">=</span><span class="n">vowel</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_text</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-7-1.png" alt="" /><!-- --></p>
+
+<p>Traditionally, since F1 is associated with vowel height, and F2, vowel backness, should the axes be reversed, the plot will read very much like the IPA vowel trapezoid! Meaning a vowel to the right, is back vowel, a vowel to the left is front vowel, and the higher it is on plot the higher the vowel and the lower it is on the plot, the lower the vowel.</p>
+
+<p>To reverse an axis, like the x-axis, we use <code class="highlighter-rouge">scale_x_reverse()</code> and for the y-axis, <code class="highlighter-rouge">scale_y_reverse</code>.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">vowel</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_text</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-8-1.png" alt="" /><!-- --></p>
+
+<p>I’m sure you noticed the legend. Ugly. Let’s get rid of it, and add a title.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
+                     </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w">
+                     </span><span class="n">color</span><span class="o">=</span><span class="n">vowel</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_text</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Daniel's English Vowels"</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-9-1.png" alt="" /><!-- --></p>
+
+<p>Let’s add another layer (another geom) to highlight my entire vowel space.  First we’ll need to get the convex hull.  While not necessary for a simple example, we’ll make a little function to extract it, to make things easier for when we plot the English and Spanish vowels on the same plot.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">find_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="k">function</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+  </span><span class="n">dataframe</span><span class="p">[</span><span class="n">chull</span><span class="p">(</span><span class="n">dataframe</span><span class="o">$</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">dataframe</span><span class="o">$</span><span class="n">F1</span><span class="p">),</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span><span class="n">eng_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">find_hull</span><span class="p">(</span><span class="n">eng</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>To include the convex hull, lets add an additional layer,the <code class="highlighter-rouge">geom_polygon</code> and pass <code class="highlighter-rouge">eng_hull</code> as the data parameter.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
+                     </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_text</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"English Vowel Hull"</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng_hull</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-11-1.png" alt="" /><!-- --></p>
+
+<p>Now, you can change the color by adding a color to the fill attribute to a new aesthetic mapping in the geom_polygon. Since this is a new layer, we include a new <code class="highlighter-rouge">aes</code> function. Technically, we could add a fill attribute to the original <code class="highlighter-rouge">aes</code>, but then ggplot2 will choose colors for you.  Why settle when you have such a wide breadth of <a href="http://sape.inf.usi.ch/quick-reference/ggplot2/colour">colors</a> at your disposal?</p>
+
+<p>Notice how labels are a bit difficult to read being behind the polygon, let’s include the alpha attribute to make and make the polygon layer transparent.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_text</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w">
+                </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w">
+                </span><span class="n">color</span><span class="o">=</span><span class="n">vowel</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Plotting the English Vowel Hull"</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">theme</span><span class="p">(</span><span class="n">legend.position</span><span class="o">=</span><span class="s2">"none"</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">eng_hull</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w">
+                                  </span><span class="n">fill</span><span class="o">=</span><span class="n">language</span><span class="p">,</span><span class="w">
+                                  </span><span class="n">alpha</span><span class="o">=</span><span class="m">.9</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_fill_manual</span><span class="p">(</span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"thistle"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-12-1.png" alt="" /><!-- --></p>
+
+<p>Alright, much better! So now that you can graph a single set of vowels into one space. Let’s include Spanish on the same chart. We’ll include <code class="highlighter-rouge">guides(color=FALSE)</code> to delete the additional color legend we don’t need. Try the code with and without it.  We’ll use ddply to subset the dataframe based on the language and finds the hulls for both languages.  This can also be done for indivdidual vowels, but there isn’t enough observations in the example data.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lang_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ddply</span><span class="p">(</span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">F1</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">language</span><span class="p">),</span><span class="w"> </span><span class="n">find_hull</span><span class="p">)</span><span class="w">
+
+</span><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> 
+                      </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
+                      </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w">
+                      </span><span class="n">color</span><span class="o">=</span><span class="n">language</span><span class="p">,</span><span class="w">
+                      </span><span class="n">fill</span><span class="o">=</span><span class="n">language</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_text</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Daniel's English &amp; Spanish Vowel Space"</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">guides</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lang_hull</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="o">=</span><span class="m">.2</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_fill_discrete</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Language"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-13-1.png" alt="" /><!-- --></p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lang_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">plyr</span><span class="o">::</span><span class="n">ddply</span><span class="p">(</span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">F1</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">language</span><span class="p">),</span><span class="w"> </span><span class="n">find_hull</span><span class="p">)</span><span class="w">
+
+</span><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">F2</span><span class="p">,</span><span class="w"> 
+                      </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
+                      </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w">
+                      </span><span class="n">fill</span><span class="o">=</span><span class="n">language</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_text</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Daniel's English &amp; Spanish Vowel Space"</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lang_hull</span><span class="p">,</span><span class="w"> </span><span class="n">alpha</span><span class="o">=</span><span class="m">.4</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">guides</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_fill_discrete</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">"Language"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-14-1.png" alt="" /><!-- --></p>
+
+<h2 id="plotting-f2-f1">Plotting F2-F1</h2>
+
+<p>It’s also common to graph F1 over F2-F1, since it produces a plot more in tune with the IPA vowel trapezoid. We can add a new column to the data, with F2-F1 find the new hulls.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span><span class="o">$</span><span class="n">difference</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">data</span><span class="o">$</span><span class="n">F2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">data</span><span class="o">$</span><span class="n">F1</span><span class="w">
+</span><span class="n">lang_hull</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">ddply</span><span class="p">(</span><span class="n">subset</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="w"> </span><span class="n">F1</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="m">0</span><span class="p">),</span><span class="w"> </span><span class="n">.</span><span class="p">(</span><span class="n">language</span><span class="p">),</span><span class="w"> </span><span class="n">find_hull</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ggplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_text</span><span class="p">(</span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">difference</span><span class="p">,</span><span class="w"> 
+                </span><span class="n">y</span><span class="o">=</span><span class="n">F1</span><span class="p">,</span><span class="w"> 
+                </span><span class="n">label</span><span class="o">=</span><span class="n">vowel</span><span class="p">,</span><span class="w">
+                </span><span class="n">color</span><span class="o">=</span><span class="n">language</span><span class="p">))</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_x_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_y_reverse</span><span class="p">()</span><span class="o">+</span><span class="w">
+  </span><span class="n">labs</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">"Daniel's English &amp; Spanish Vowel Space"</span><span class="p">,</span><span class="w">
+       </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"F2 - F1"</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">geom_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">lang_hull</span><span class="p">,</span><span class="w">
+               </span><span class="n">alpha</span><span class="o">=</span><span class="m">.2</span><span class="p">,</span><span class="w">
+               </span><span class="n">aes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">difference</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F1</span><span class="p">,</span><span class="w">
+                   </span><span class="n">fill</span><span class="o">=</span><span class="n">language</span><span class="p">,</span><span class="w">
+                   </span><span class="n">color</span><span class="o">=</span><span class="n">language</span><span class="p">))</span><span class="o">+</span><span class="w">
+  </span><span class="n">guides</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">scale_fill_manual</span><span class="p">(</span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s2">"tomato2"</span><span class="p">,</span><span class="s2">"seagreen1"</span><span class="p">),</span><span class="w">
+                    </span><span class="n">name</span><span class="o">=</span><span class="s2">"Language"</span><span class="p">)</span><span class="o">+</span><span class="w">
+  </span><span class="n">theme_bw</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/assets/2019-26-10-creating-vowel-plots/creating-vowel-plots-16-1.png" alt="" /><!-- --></p>
+:ET
