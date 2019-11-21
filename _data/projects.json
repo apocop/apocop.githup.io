@@ -3,8 +3,15 @@
 		"name": "Al Bhed Translator",
 		"image": "translation.png",
 		"url": "/al-bhed-translator",
-		"date": "Jan 2019",
+		"date": "July 2019",
 		"tags": ["Python"]
+	},
+	{
+		"name": "NLP Notepad",
+		"image": "nlp-notepad.png",
+		"url": "/nlp-notepad",
+		"date": "Nov 2019",
+		"tags": ["Python", "TKinter", "spaCy"]
 	},
 
 ]
