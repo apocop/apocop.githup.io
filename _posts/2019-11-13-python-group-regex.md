@@ -310,4 +310,4 @@ We can see that the new top products all received significant count increases wh
 
 ### Conclusion
 
-In this post we saw how we could extract substrings using regular expression named groups, and how we could use them to clean up messy data. The more accurate our
+In this post we saw how we could extract substrings using regular expression named groups, and how we could use them to clean messy data. The cleaner the data, the easier it is to model and extract insites.

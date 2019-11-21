@@ -3,9 +3,6 @@ layout: post
 title: "Creating Vowel Plots in R"
 author: "Daniel Dorado"
 date: "October 26, 2019"
-output:
-  html_document:
-    keep_md: true
 categories: R phonology
 ---
 
