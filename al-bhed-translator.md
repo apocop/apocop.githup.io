@@ -2,6 +2,7 @@
 layout: project
 title: Al Bhed Translator
 permalink: /al-bhed-translator
+date: "July 6, 2019"
 ---
 
 ## English ↔ Al Bhed Translator
