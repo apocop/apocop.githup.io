@@ -2,7 +2,6 @@
 layout: project
 title: NLP Notepad
 permalink: /nlp-notepad
-author: "Daniel Dorado"
 date: "November 20, 2019"
 ---
 
@@ -19,7 +18,8 @@ Being a new project, it doesn't have too many features yet, but more will added.
 * **Open** Text Documents
 * **Save** Text Documents
 
-#### NLP Features
+#### NLP Features:
 * Token count
 * Word-type count
-* Type-Token Ratio for *Lexical Diveristy*
+* Type-Token Ratio for *Lexical Diversity*
+* Parts of Speech Count
