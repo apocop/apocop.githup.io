@@ -4,8 +4,7 @@ title: Projects
 permalink: /projects/
 ---
 
-# A few of my projects.
+### A few of my projects.
 
-### Under Construction!!!
 
-Feel free look at my github [apocop](https://github.com/apocop/) for the time being.
+Feel free wander around my [GitHub](https://github.com/apocop/).
