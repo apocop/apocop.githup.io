@@ -9,20 +9,20 @@ categories: python normalization text nlp regex
 # Normalizing Text with Regex Groups in Python
 
 
-In this post we're going to look at how regex groups can help clean messy text data, and in this specific case by normalizing product numbers.  The data comes from [RFX]([http://www.sourcinginnovation.com/glossary/RFX.php) instrument bids.  The challenge here is that while a company may have a concrete way of idenitfy their own products, these product IDs are commonly mistyped when customers request product. We'll see to fix common mistakes by a regular expression that matches all the erroneous forms and uses groups to pull out specific parts from the regex.
+In this post we're going to look at how regex groups can help clean messy text data, and in this specific case by normalizing product numbers.  The data comes from [RFX]([http://www.sourcinginnovation.com/glossary/RFX.php) instrument bids.  The challenge here is that while a company may have a concrete way of identify their own products, these product IDs are commonly mistyped when customers request product. We'll see to fix common mistakes by a regular expression that matches all the erroneous forms and uses groups to pull out specific parts from the regex.
 
 ### Basic Yamaha Product ID
 
-[Yamaha](https://www.yamaha.com/en/), the world's largest instrument manufactuer, has designed a Product ID system which encodes descriptive information about the product.  Identifing the inherent morphology allows someone to know which instrument it is, but also any special customizations or features it may have. Luckily for us, we don't need to know that.
+[Yamaha](https://www.yamaha.com/en/), the world's largest instrument manufacturer, has designed a Product ID system which encodes descriptive information about the product.  Identifying the inherent morphology allows someone to know which instrument it is, but also any special customizations or features it may have. Luckily for us, we don't need to know that.
 
 Let's use the Yamaha Tuba, [YBB-105WC](https://usa.yamaha.com/products/musical_instruments/winds/tubas/ybb-105/specs.html#product-tabs), as our base example. For our purposes the pattern of the Yamaha wind instrument is:
 
-| Brand | Instrument | Hyphen | Series | Feates | Mark/Iteration* |
+| Brand | Instrument | Hyphen | Series | Features | Mark/Iteration* |
 |:---|:---|:---|:---|:---|:---|
 | Y | BB | - | 105 | WC | ∅ |
 | Yamaha | Tuba | delimiter |  100 Series | With Case | Product Iteration |
 
-> The Mark or iteration is usally written with Roman Numerals, such as YAS-200AD**II**. No roman numerals means the product is the first iteration!
+> The Mark or iteration is usually written with Roman Numerals, such as YAS-200AD**II**. No roman numerals means the product is the first iteration!
 
 Since we don't need to pull out this level of detail from IDs in our example, we'll reduce this template even further.
 
@@ -47,10 +47,10 @@ Our goal is to get all Yamaha product IDs into a canonical form reducing messy d
 
 * ALL CAPS
 * No spaces
-* Has delininating hyphen
+* Has delineating hyphen
 * Mark (as in 'mark Ⅰ' or 'mark Ⅱ') is optional, but present if available
 
-This would mean that the previous list of error examples will all be canonicalized as YAS-200II and whichever mark such as 'II' or otherwise will only be included if it's already listed. It's absense will only be considered a typo.
+This would mean that the previous list of error examples will all be canonicalized as YAS-200II and whichever mark such as 'II' or otherwise will only be included if it's already listed. It's absence will only be considered a typo.
  
 ### Libraries
 
@@ -66,9 +66,9 @@ from collections import Counter
 
 ### Python Regex Groups
 
-Part of the `re` library, groups allow you select and extract certain subpatterns of a regular expression. So we'll pull out the germane parts of an ID and and normalize them to our standard form.
+Part of the `re` library, groups allow you select and extract certain sub-patterns of a regular expression. So we'll pull out the germane parts of an ID and and normalize them to our standard form.
 
-The syntax of a group is simple:  (?P&lt;group_name&gt;…) where **group_name** is a name we choose for this group and the elipsis is the regex for the group. 
+The syntax of a group is simple:  (?P&lt;group_name&gt;…) where **group_name** is a name we choose for this group and the ellipsis is the regex for the group. 
 
 For example, let's separate 'Y' from 'FL' in 'YFL'. We assign 'FYL' to `string` and for our pattern we make two groups in one regular expression. One named `yamaha` and the other `instrument`.
 
@@ -115,18 +115,18 @@ print(f'Sample of Product IDs: {products[:4]}')
     Sample of Product IDs: ['YAC1607', 'YAS - 26', 'YAS - 480', 'YAS - 480SY']
     
 
-The Table below describes this regex chunch by chunck. For a more thorough regex review, consult the [re documentation](https://docs.python.org/3.8/library/re.html). Notice 
+The Table below describes this regex chunk by chunk. For a more thorough regex review, consult the [re documentation](https://docs.python.org/3.8/library/re.html). Notice 
 
 
-| Regex component | Explaination |
+| Regex component | Explanation |
 |:---|:---|
-| \b | word boundry |
+| \b | word boundary |
 | (?P&lt;yamaha_instrument&gt;Y[A-Z]{2}) | a group name **yamaha_instrument** that consists of a y followed by two other alphabetic characters |
 | [\s-]* | zero or more spaces or hyphens in any order |
 | (?P&lt;series&gt;[0-9]+[A-Z]*) | a group named **series** which can consist one or more numbers followed by zero or more alphabetic characters |
 | \s* |  zero or more spaces |
 | (?P&lt;mark&gt;I*) | named group called **mark** which consists of zero or more i's |
-| \b' | word boundry |
+| \b' | word boundary |
 
 `products` is a list of various Yamaha product IDs.  The data comes from RFX data which can be found [here](https://github.com/apocop/apocop.github.io/blob/master/_jupyter/2019-11-13-python-group-regex/yamaha_skus.txt).
 
@@ -310,4 +310,4 @@ We can see that the new top products all received significant count increases wh
 
 ### Conclusion
 
-In this post we saw how we could extract substrings using regular expression named groups, and how we could use them to clean messy data. The cleaner the data, the easier it is to model and extract insites.
+In this post we saw how we could extract substrings using regular expression named groups, and how we could use them to clean messy data. The cleaner the data, the easier it is to model and extract practical and actionable insights.
