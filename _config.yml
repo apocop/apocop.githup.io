@@ -1,5 +1,5 @@
 title: NLP Notebook
-description: NLP Programming Blog
+description: A Programming and NLP Blog
 author: Daniel Dorado
 logo: /static/img/avatar.png
 github: https://github.com/apocope
@@ -9,13 +9,8 @@ url: "https://github.com/apocop/apocop.github.io"
 
 allowsearch: False
 
-# disqus_shortname: aboutashu
-# google_analytics: UA-72862926-1
-
-
-#share:
-#  twitter_username: \#
-#  fb_appid: 000000000000
+disqus_shortname: nlp-notebook
+google_analytics: UA-153415457-1
 
 
 enableTags: true
