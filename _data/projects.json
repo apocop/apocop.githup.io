@@ -11,5 +11,11 @@
 		"url": "/nlp-notepad",
 		"tags": ["Python", "TKinter", "spaCy"]
 	},
+	{
+		"name": "Unicode Search",
+		"image": "unicode_search-1.png",
+		"url": "/unicode-search",
+		"tags": ["Python", "Django"]
+	},
 
 ]
