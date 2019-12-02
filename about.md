@@ -4,8 +4,7 @@ title: About
 permalink: /about/
 ---
 
-Hello, my name is Daniel Dorado, I'm a linguist and I find the tools we
-build using Natural Language Processing and Machine Learning fascinating. Whether
-it's a digital assistant such as Siri, a language model for text prediction, or
-building a chatbot.
+### Welcome!
+Why hello there! My name is Daniel and I'm into programming and linguistics. I'm so into these that I got a degree in Speech and Language Technologies. :D 
 
+I like building useful tools. 
