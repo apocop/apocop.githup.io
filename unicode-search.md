@@ -15,3 +15,6 @@ Made in Python, using the Django framework, start a new project add the [module]
 
 
 ![](/static/projects/unicode_search.png)
+
+
+front project photo credit: vladdythephotogeek <a href="http://www.flickr.com/photos/72451959@N00/4886804743">Investigation</a> via <a href="http://photopin.com">photopin</a> <a href="https://creativecommons.org/licenses/by-nc-nd/2.0/">(license)</a>
