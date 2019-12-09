@@ -1,8 +1,9 @@
 title: NLP Notebook
 description: A Programming and NLP Blog
-author: Daniel Dorado
+author: Daniel J. Dorado
 logo: /static/img/avatar.png
 github: https://github.com/apocope
+about: Computational Linguist
 
 # baseurl: "www.nlpnotebook.com"
 url: "https://github.com/apocop/apocop.github.io"
