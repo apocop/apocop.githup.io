@@ -90,7 +90,7 @@ punctuation...
 ### Internal punctuation.
 
 Not all languages use punctuation in the same way.  A personal favorite is
-(Armenian Tonal Punctuation)[https://www.youtube.com/watch?v=vu9_QB9gqTQ],
+[Armenian Tonal Punctuation](https://www.youtube.com/watch?v=vu9_QB9gqTQ),
 where punctuation (like !, ? and :) is attached to the syllable in the word that you would like
 to emphasize. For example with the question mark: (I'll be using English
 English to illustrate the example.)
