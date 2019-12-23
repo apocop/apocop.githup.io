@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Creating Vowel Plots in R"
-author: "Daniel Dorado"
+author: "Daniel J. Dorado"
 date: "October 26, 2019"
 categories: R phonology
 ---
