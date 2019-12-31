@@ -8,17 +8,25 @@ categories: python tokenization nlp normalization project
 
 ## Exceptions
 
-So let's get started making the `exceptions.py` file. As you see mine is 
+So let's get started making the `exceptions.py` file. As you see this, is 
 pretty basic. It's just a Python dictionary with a few tokens that, for this
-example, we're going to going to treat irregularly.  The first step in or
-tokenization pipeline is to see if it's in this list.  Notice that the value is
-of each entry is a list. We'll iterate through each item and add it to our final
-list of tokens. Things you add here will not checked against the rules we define
-in our grammar. 
+example, we're going to going to treat as exceptions.  The first step in our
+tokenization pipeline is to see if it's in this list. If a word is in this 
+list we'll add the associated tokens in to our final tokens list. Since
+everything here is an exception, the *approved tokens here* will not be
+checked against our grammar rules.
 
-This to consider adding here are more contractions.  I'm not too concerned about, 
+Things to consider adding here are more contractions.  This tokenizer isn't
+concerned about capitalization so `What's` and `what's` are treated
+separately.  I won't worry about it in this example, but feel free to
+adjust the tokenizer as needed.
 
+While, I'm not adding too many exceptions for this example, experiment.
+What kind of other things might be included in here.
 
+It's not uncommon to have a lexicon for common abbreviations. Like `Mr.`
+and `U.K.`. As needs arise you may finding yourself needing to add to
+this list.
 
 ```
 """
@@ -33,3 +41,8 @@ LEXICON = {
 }
 
 ```
+
+## Next Post
+
+In the next post we'll start building the grammar and write tests to ensure the
+rules are encapsulated as intended.
