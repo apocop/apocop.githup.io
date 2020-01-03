@@ -55,12 +55,10 @@ EOS = '$'
 PLUS = '+'
 STAR = "*"
 PERIOD = r'\.'
-OPEN_GROUP = '('
-CLOSE_GROUP = ')'
 INITIAL_PUNCTUATION = '[\'"]'
 FINAL_PUNCTUATION = '[\',!?":.]'
 CURRENCY_SYMBOL = '[$£¥€]'
-ZERO_OR_ONE = '?'
+QUESTION_MARK = '?
 ```
 
 Some of these may seem ridiculous, like `PLUS`, or `PERIOD`, but it
@@ -98,7 +96,7 @@ regex group.
 
 ```
 def create_group(expression):
-    return OPEN_GROUP + expression + CLOSE_GROUP
+    return '(' + expression + ')'
 ```
 
 This function is mostly for legibility. Notice is uses the characters and sets 
@@ -111,7 +109,7 @@ INITIAL_PUNCTUATION_GROUP = create_group(INITIAL_PUNCTUATION)
 FINAL_PUNCTUATION_GROUP = create_group(FINAL_PUNCTUATION + PLUS)
 FINAL_PUNCTUATION_STAR_GROUP = create_group(FINAL_PUNCTUATION + STAR)
 CURRENCY_SYMBOL_GROUP = create_group(CURRENCY_SYMBOL)
-CURRENCY_GROUP = create_group(DIGITS + PLUS + PERIOD + ZERO_OR_ONE + DIGITS + '{,2}')
+CURRENCY_GROUP = create_group(DIGITS + PLUS + PERIOD + QUESTION_MARK + DIGITS + '{,2}')
 ALPHA_PUNCTUATION_GROUP = create_group(ALPHA + FINAL_PUNCTUATION + STAR)
 ```
 
@@ -131,9 +129,11 @@ the boundary in which a token needs to be split.
 ```
 INITIAL_PUNCTUATION_TOKEN = INITIAL_PUNCTUATION_GROUP + ALPHA_PUNCTUATION_GROUP
 FINAL_PUNCTUATION_TOKEN = ALPHA_GROUP + FINAL_PUNCTUATION_GROUP
-ALL_PUNCTUATION_TOKEN = OPEN_GROUP + FINAL_PUNCTUATION + CLOSE_GROUP + FINAL_PUNCTUATION_GROUP
-CURRENCY_AMOUNT_TOKEN = CURRENCY_SYMBOL_GROUP + CURRENCY_GROUP + FINAL_PUNCTUATION_STAR_GROUP
+PUNCTUATION_TOKEN = create_group(FINAL_PUNCTUATION) + FINAL_PUNCTUATION_GROUP
+CURRENCY_TOKEN = CURRENCY_SYMBOL_GROUP + CURRENCY_GROUP + FINAL_PUNCTUATION_STAR_GROUP
 ```
 
-In `ALL_PUNCTUATION_TOKEN`, notice that we're creating a group manually. Notice that of these
-groups makes the distinction of having 
+The `PUNCTUATION_TOKEN` rule, notice that we're creating in the definition
+since the group isn't being used elsewhere. If later a new rule would benefit
+from the same group, it would be better to definite it as a constant variable
+like the other groups.
