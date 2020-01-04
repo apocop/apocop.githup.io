@@ -203,6 +203,12 @@ that our regexes are what we think they should be. Any time we make a change to
 a rule, the regex here will have to be updated. Otherwise the test will fail.
 See if you can make the test fail. It's all too easy.
 
+
+A couple notes about pytest if you're unfamiliar with it. Naming is important
+For example, in order for pytest to find the file full of tests in the file
+name as to start with test! Also, once the file is found each test as to start
+with the *test*.
+
 ```
 import grammar
 
@@ -250,3 +256,13 @@ test_tokenizer.py::test_currency_regex PASSED                                   
 ================================================== 4 passed in 0.05s ==================================================
 ```
 
+### Testing the future
+
+For now these are all the tests we're going to add. When the tokenizer is built
+we'll add tests for each rule to verify that the rules are working harmoniously
+with each other and producing correct results.  However, feel free to add
+additional tests testing only an individual rule. The more test cases, the
+better.
+
+In the next post, we'll start work on the tokenizer itself, now that the
+grammar and exceptions components are complete.
