@@ -2,17 +2,17 @@
 layout: post
 title: "Let's Make a Tokenizer Part 3"
 author: "Daniel Dorado"
-date: "Jan 02, 2020"
+date: "Jan 06, 2020"
 categories: python tokenization nlp normalization project
 ---
 
 ## Grammar
 
-So as mentioned in the previous posts, the grammar is where rules are
+So as mentioned in the first post, the grammar is where rules are
 specified.  These grammatical rules will check to see if a token is
-not grammatical. If a token passes, it'll pass on the next rule, if it fails
+*not grammatical*. If a token passes, it'll pass on the next rule, if it fails,
 it'll get broken up, and the newly created tokens will begin their journey
-through the pipeline. In our grammar, we're going to specify 4 rules:
+through the pipeline. In our grammar, we'll specify 4 rules:
 
 1. initial_punctuation - separate token-initial punctuation
 2. final_punctuation - separate token-final punctuation
@@ -28,14 +28,15 @@ and often they conflict. So our rules in this grammar will follow a generic
 American English grammar. In our small grammar this won't matter too much, but
 this does change what we consider initial punctuation or final punctuation, how
 currency is written. With that being said, this tokenizer will not well, for
-Spanish and French.
+other languages such as Spanish and French.
 
 ### Regular Expressions
 
-We'll be defining rules for our grammar using regexes, but the longer the regex
-gets the more unwieldy and unreadable they become. So we'll construct them by
-building them by assigning smaller sets and characters into the basic to
-reusable variables and concatenating them into larger regexes.
+We'll be defining rules for our grammar using regexes. The longer the regex,
+the more unwieldy and unreadable it becomes. So we'll construct a regex by
+building up it by assigning smaller sets and characters to variables and
+joining them into larger regexes. A benefit to this style is that these
+components will be shared by multiple rules. 
 
 So let's start by importing the `re` library, and creating the basic sets we'll
 use in our rules.
@@ -63,12 +64,13 @@ QUESTION_MARK = '?
 
 Some of these may seem ridiculous, like `PLUS`, or `PERIOD`, but it
 makes it very clear and readable even to someone who later has to read and edit
-your grammar. Maybe yourself months after you last looked at this. Let's look at
-a few more of these. 
+your grammar. Maybe yourself, months after you last looked at it. Let's review
+a few more of these in more detail.
 
 * `ALPHA` is at least one alphabetic character. We'll be compiling our final
 regexes with the `re.IGNORECASE` flag, so it isn't necessary to include `a-z`
-in the alphabetic set. What does this mean for a token like `café` or `naïve",`?
+in this alphabetic set. What does this mean for a token like `café` or 
+`naïve",`?
 
 * `BOS` means *Beginning of String* and `EOS` means *End of String*.
 
