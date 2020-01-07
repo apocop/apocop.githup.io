@@ -161,8 +161,8 @@ is why the `PUNCTUATION_TOKEN` rule comes after the other rules dealing with
 punctuation. Since the other rules have to break up punctuation first, it is
 unlikely that a pure punctuation token is going to exist (unless it's an
 emoticon), and so checking before it would be broken down causes superfluous
-rule checks. On a small dataset there probably wouldn't be a noticeable
-difference, but a larger dataset could definitely be influenced.
+rule checks. On a small dataset there isn't a noticeable difference, but a
+larger dataset could definitely be influenced.
 
 > You may be concerned that Python dictionaries don't remember ordering, but
 for now as of [Python 3.6 they do](https://docs.python.org/3/whatsnew/3.6.html#whatsnew36-compactdict).
@@ -172,7 +172,7 @@ for now as of [Python 3.6 they do](https://docs.python.org/3/whatsnew/3.6.html#w
 The order of business is to compile our rules. Let's add a function that does
 just that.  This rule compiles our string, but also adds `BOS` and `EOS` to
 the string. This guarantees that our rule has to match the entire token and
-not just a substring of it.  Also notice, that we pass the `re.IGNORECASE`
+not a substring of it.  Also notice, that we pass the `re.IGNORECASE`
 flag.
 
 ```
@@ -192,12 +192,11 @@ RULES = {key:compile_rule(value) for (key, value) in RULES_TO_EXPORT.items()}
 
 ### Testing 1, 2, 3
 
-Testing is a very for text normalization and building grammars. They verify,
+Testing is a must for text normalization and building grammars. They verify,
 that they do what we intend.  For now we're just going to add a simple test
-for each rule to verify that the regex we've constructed is the actual
-we think we've made are the ones that we actually made. If you're not familiar
-with testing or [pytest](https://docs.pytest.org/en/latest/), I highly suggest
-you look into it.
+for each rule to verify that the regex we've constructed is the regex we
+intended. If you're not familiar with testing or [pytest](https://docs.pytest.org/en/latest/)
+, I highly suggest you look into it.
 
 In our `test_tokenizer.py` file, import our newly created grammar and
 specifically the rules we just made. These tests are pretty basic, just assert
@@ -207,9 +206,9 @@ See if you can make the test fail. It's all too easy.
 
 
 A couple notes about pytest if you're unfamiliar with it. Naming is important
-For example, in order for pytest to find the file full of tests in the file
-name as to start with test! Also, once the file is found each test as to start
-with the *test*.
+For example, in order for pytest to locate the test file the name as to start
+with 'test'! Also, once the file is found each test also has to start
+with the 'test'.
 
 ```
 import grammar
@@ -267,4 +266,5 @@ additional tests testing only an individual rule. The more test cases, the
 better.
 
 In the next post, we'll start work on the tokenizer itself, now that the
-grammar and exceptions components are complete.
+grammar and exceptions components are complete. Feel free to look at the
+peak and look at the completed [source code](https://github.com/apocop/NLP-Notebook-Examples/tree/master/2019-12-23-lets-build-a-tokenizer). 
