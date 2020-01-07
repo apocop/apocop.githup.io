@@ -16,4 +16,4 @@ categories: python tokenization nlp normalization project
 1. Add support for borrowed words like café.  How many diacritics does
 English usually import?
 
-2. 
+2. Allow for English plural possessives.
