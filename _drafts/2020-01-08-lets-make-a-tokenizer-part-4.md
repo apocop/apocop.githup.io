@@ -37,13 +37,10 @@ class Tokenizer:
 ```
 
 
-< The double-underscore in `__add_exception` and `__tokenize_pipeline` indicate
-that they are private methods. Whoever uses this class should only use the 
-`tokenize` method. Private just means they are for internal use inside the class.
-Let's look into these methods a little more deeply.
-
-* `__add_exception` - Iterate through the value from the exception lexicon and
-add them to `accepted_tokens`.
+< The double-underscore in `__tokenize_pipeline` indicate that they are private
+methods. Whoever uses this class should only use the `tokenize` method. Private
+just means they are for internal use inside the class. Let's look into these
+methods a little more deeply.
 
 * `__tokenize_pipeline` - Check each token against the rule, breaking it up if
 it doesn't pass and recursively call itself on the smaller tokens.

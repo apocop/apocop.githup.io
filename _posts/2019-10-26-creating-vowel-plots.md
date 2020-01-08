@@ -71,7 +71,7 @@ data
 ## 14           hube 346  680        u  Spanish
 ```
 
-### A Sidenote Regarding Excel.  
+### A Side note Regarding Excel.  
 Unfortunately, When Excel generates a file in UTF-8, "**X.U.FEFF.**", is prepended to the file  This explains the strange name for the first column, X.U.FEFF.words. It doesn't really cause a problem, but being ugly, and awkward to remember and type, we rename the column to *words* as it was intended.
 
 

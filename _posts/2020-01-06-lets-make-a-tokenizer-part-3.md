@@ -140,6 +140,8 @@ since the group isn't being used elsewhere. If later a new rule would benefit
 from the same group, it would be better to definite it as a constant variable
 like the other groups.
 
+> While you make your own rules it's important avoid [non-deterministic expressions](https://stackoverflow.com/questions/33895542/why-regular-expression-x-yx-z-is-nondeterministic). 
+
 ### Rule dictionary
 
 Finally let's make dictionary, where the key is the rule name, and the value is
