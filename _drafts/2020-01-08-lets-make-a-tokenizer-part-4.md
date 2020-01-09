@@ -2,7 +2,7 @@
 layout: post
 title: "Let's Make a Tokenizer Part 4"
 author: "Daniel Dorado"
-date: "Jan 08, 2020"
+date: "Jan 09, 2020"
 categories: python tokenization nlp normalization project
 ---
 
@@ -68,11 +68,34 @@ of exceptions or passed every rule defined in our grammar. Notice that we also
 generate a list from our grammar rules. This list is in order the order they
 were added, thus the order in which they will be applied.
 
+### Tokenize
 
+Let's build our tokenizer function. The reason for the reassignment of
+`self.accepted_tokens` as an empty list is to clear the *cache* of tokens so
+that when called in succession you there won't be tokens from previously
+processed documents. 
 
+```
+def tokenize(self, string):
+    self.accepted_tokens = []
+    tokens = (token for token in string.split())
+    for token in tokens:
+        self.__tokenize_pipeline(token)
 
+    return self.accepted_tokens
+```
 
-
+`tokens = (token for token in string.split())` is a pretty interesting. It may
+seem at first glace that this just a typical list comprehension, but notice 
+than rather than square brackets `[]`, parenthesis are used.  It's a 
+generator comprehension. A list comprehension would immediately split the
+entire string and load it into memory.  A generator comprehension on the other
+hand makes use of lazy loading. A generator yields a single token when it's
+needed so extraneous memory is not used. As documents can range in size, this
+also us to save memory, which will help prevent the tokenizer from slowing. See
+[Reduce Memory Usage and Make Your Python Code Faster Using Generators](https://towardsdatascience.com/reduce-memory-usage-and-make-your-python-code-faster-using-generators-bd79dbfeb4c)
+for more information on generators in Python. We call the our NLP pipeline on
+every token in the generator.  Lastly we return the `accepted_tokens`.
 
 
 
