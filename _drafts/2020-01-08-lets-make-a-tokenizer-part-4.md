@@ -183,8 +183,73 @@ I have $ 43 , while you have € 3.32 .
 ### Tests
 In the last post we added a few tests to verify the regex we created were those
 we intended. Now, that the entire tokenizer build. New tests need to be added
-to verify it is working as intended.
+to verify it is working as intended. Here the tests I added, but it wouldn't
+hurt to add more. Is the system really working as intended? 
 
+```
+# Test rules.
+def test_inital_punctuation_rule():
+    """Test the tokenizer pipeline is tokenizing initial punctuation."""
+    inital_punctuation_testdata = {
+        '"Hi' : ['"', 'Hi'],
+        '\'Hi' : ['\'', 'Hi'],
+        '-Hi' : ['-Hi'],
+        '""hi' : ['""hi'],
+    }
+
+    for test, answer in inital_punctuation_testdata.items():
+        assert TOKENIZER.tokenize(test) == answer
+
+def test_final_punctuation_rule():
+    """Test the tokenizer pipeline is tokenizing final punctuation."""
+    final_punctuation_testdata = {
+        'Say,' : ["Say", ','],
+        'Hi...' : ['Hi', '.', '.', '.'],
+        'Like this:' : ['Like', 'this', ':'],
+        'E.T.' : ['E.T.'],
+        'etc.' : ['etc', '.'],
+    }
+
+    for test, answer in final_punctuation_testdata.items():
+        assert TOKENIZER.tokenize(test) == answer
+
+
+def test_all_punctuation_rule():
+    """Test the tokenizer pipeline is tokenizing all punctuation."""
+    all_punctuation_testdata = {
+        '",' : ["\"", ','],
+        '\',' : ["\'", ','],
+    }
+
+    for test, answer in all_punctuation_testdata.items():
+        assert TOKENIZER.tokenize(test) == answer
+
+
+def test_currency_amount_rule():
+    """Test the tokenizer pipeline is tokenizing currency amount."""
+    currency_amount_testdata = {
+        '$5.00' : ['$', '5.00'],
+        '¥32' : ['¥', '32'],
+        '¥35.00' : ['¥', '35.00'],
+        '€23.00' : ['€', '23.00'],
+        '€1.23,' : ['€', '1.23', ','],
+    }
+
+    for test, answer in currency_amount_testdata.items():
+        assert TOKENIZER.tokenize(test) == answer
+
+def test_exceptions():
+    """Test the tokenizer pipeline using exceptions."""
+    exceptions_testdata = {
+        "don't" : ["do", "n't"],
+        "isn't" : ["is", "n't"],
+        "What's" : ["What", "'s"],
+        "what's" : ["what's"],
+        "I'm" : ["I", "'m"],
+    }
+    for test, answer in exceptions_testdata.items():
+        assert TOKENIZER.tokenize(test) == answer
+```
 
 
 
@@ -196,3 +261,4 @@ to verify it is working as intended.
 English usually import?
 2. Allow for English plural possessives.
 3. Make a rule to split tokens with internal punctuation like E.T.A. better.
+4. Add more tests, e.g. sentences.
