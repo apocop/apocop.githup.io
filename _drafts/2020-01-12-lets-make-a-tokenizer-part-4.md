@@ -33,14 +33,14 @@ class Tokenizer:
 
 
 >  The double-underscore in `__tokenize_pipeline` indicate that it is a private
-method. Private meaning for internal use inside the class only. 
+method. *Private* meaning for internal use inside the class only. 
 
 Let's look into these methods a little more deeply.
 
 * `__tokenize_pipeline` - Check each token against the rules, breaking it up if
 it doesn't pass and recursively call itself on the smaller tokens.
 
-* `tokenize` - A public function. Returns a list of tokens.
+* `tokenize` - Return a list of tokens.
 
 
 ### Instance Variables
@@ -56,11 +56,11 @@ def __init__(self):
     self.accepted_tokens = None
 ```
 
-Notice we're importing our grammar rules and exceptions list lexicon into the
+Notice we're importing our grammar rules and exceptions lexicon into the
 tokenizer.  We also create a variable that will eventually hold our tokens,
 `accepted_tokens`. *Accepted* meaning that the token either was in our lexicon
 of exceptions or passed every rule defined in our grammar. Notice that we also
-generate a list from our grammar rules. This list is in order the order they
+generate a list of our grammar rules. This list is in order the order they
 were added, thus the order in which they will be applied.
 
 ### Tokenize
@@ -132,19 +132,21 @@ regex), it is immediately broken into its constituent groups defined by the
 rule. Then we call `__tokenize_pipeline` recursively on every every subsequent
 token. 
 
-> Rather than a while loop, a for loop is probably a more intuitive, but this avoids
-having to use a break statement to stop moving on to the next rule.
+> Rather than a *while loop*, a *for loop* is probably more intuitive, but
+a while loop avoids having to use a break statement to stop moving on to the
+next rule.
 
 Now when a token passes rule.  We check to see if the rule being checked was
 the last rule. If it isn't, the `rule_index` is augmented by 1 and the check
-is performed with a new rule. If the rule that was passed is the last rule,
-then the token is added to `accepted_tokens`, where the process beings again.
+is performed with a new rule. If the last rule passes, then the token is added
+to `accepted_tokens`, where the process beings again with a new token.
 
 ### Demo
 
-The demo here is pretty simple.  We created a few example lines.  We
-instantiate a tokenizer object, and pass it's tokenize function every line.
-Boom!  It works. Remember this is in the `demo.py` file.
+The demo here is pretty simple.  We created a few example lines.  Feel free to
+include your own. We instantiate a tokenizer object, and call its tokenize
+method on every line. Boom! Tokenization. Remember this is in the `demo.py`
+file.
 
 ```
 import tokenizer
@@ -186,27 +188,24 @@ path\to\python path\to\demo.py
 
 ### Tests
 In the last post we added a few tests to verify the regex we created were those
-we intended. Now, that the entire tokenizer build. New tests need to be added
-to verify it is working as intended. Here the tests I added, but it wouldn't
-hurt to add more. Is the system really working as intended? What improvements
-could be made?
+we intended. Now, that the entire tokenizer built. New tests need to be added
+to verify it is working as intended. Here are the tests I added, but it
+wouldn't hurt to add more. Is the system really working as intended? What
+improvements could be made?
 
 ```
 # Test rules.
 def test_inital_punctuation_rule():
-    """Test the tokenizer pipeline is tokenizing initial punctuation."""
     inital_punctuation_testdata = {
         '"Hi' : ['"', 'Hi'],
         '\'Hi' : ['\'', 'Hi'],
         '-Hi' : ['-Hi'],
         '""hi' : ['""hi'],
     }
-
     for test, answer in inital_punctuation_testdata.items():
         assert TOKENIZER.tokenize(test) == answer
 
 def test_final_punctuation_rule():
-    """Test the tokenizer pipeline is tokenizing final punctuation."""
     final_punctuation_testdata = {
         'Say,' : ["Say", ','],
         'Hi...' : ['Hi', '.', '.', '.'],
@@ -214,24 +213,20 @@ def test_final_punctuation_rule():
         'E.T.' : ['E.T.'],
         'etc.' : ['etc', '.'],
     }
-
     for test, answer in final_punctuation_testdata.items():
         assert TOKENIZER.tokenize(test) == answer
 
 
 def test_all_punctuation_rule():
-    """Test the tokenizer pipeline is tokenizing all punctuation."""
     all_punctuation_testdata = {
         '",' : ["\"", ','],
         '\',' : ["\'", ','],
     }
-
     for test, answer in all_punctuation_testdata.items():
         assert TOKENIZER.tokenize(test) == answer
 
 
 def test_currency_amount_rule():
-    """Test the tokenizer pipeline is tokenizing currency amount."""
     currency_amount_testdata = {
         '$5.00' : ['$', '5.00'],
         '¥32' : ['¥', '32'],
@@ -239,12 +234,10 @@ def test_currency_amount_rule():
         '€23.00' : ['€', '23.00'],
         '€1.23,' : ['€', '1.23', ','],
     }
-
     for test, answer in currency_amount_testdata.items():
         assert TOKENIZER.tokenize(test) == answer
 
 def test_exceptions():
-    """Test the tokenizer pipeline using exceptions."""
     exceptions_testdata = {
         "don't" : ["do", "n't"],
         "isn't" : ["is", "n't"],
@@ -256,7 +249,6 @@ def test_exceptions():
         assert TOKENIZER.tokenize(test) == answer
 ```
 
-
 ### Suggestions for Future Tokenizer Updates
 
 1. Add support for borrowed words like café.  How many diacritics does
@@ -265,10 +257,11 @@ English usually import?
 3. Make a rule to split tokens with internal punctuation like E.T.A. better.
 4. Add more tests, e.g. sentences.
 
-Remember for every change to the grammar, add new tests.
-
-Fortunately, most of the time, you won't have to build a tokenizer yourself.
-Check out a few packages that have tokenizers. 
+Remember for every change to the grammar, add new tests. Fortunately, most of
+the time, you won't have to build a tokenizer yourself. Don't forget to the
+[source code](https://github.com/apocop/NLP-Notebook-Examples/tree/master/2019-12-23-lets-build-a-tokenizer)
+is available if you want to compare. Check out a few packages that have
+tokenizers. 
 
 * [NLTK](https://www.nltk.org/api/nltk.tokenize.html) has few tokenizers made
 for generic and specialized domains like tweets from Twitter.
