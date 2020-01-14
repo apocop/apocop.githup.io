@@ -6,4 +6,15 @@ date: "Jan 12, 2020"
 categories: python pynini FSM FST
 ---
 
-### Pynini
+Pynini compiles grammars into weighted finite state transducers.
+
+### Installing Pynini
+The easiest way to install Pynini is you use a Linux machine and the Anaconda
+Python package manager.
+
+```
+conda install -c conda-forge
+```
+
+If you'd like to install Pynini on Windows, there's a different approach, see
+this question on [Stack Overflow](https://stackoverflow.com/questions/57898360/how-can-i-install-and-use-pynini-on-windows-10).
