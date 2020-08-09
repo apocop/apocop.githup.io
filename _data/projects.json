@@ -12,10 +12,10 @@
 		"tags": ["Python", "TKinter", "spaCy"]
 	},
 	{
-		"name": "Unicode Search",
-		"image": "unicode_search-1.jpg",
-		"url": "/unicode-search",
-		"tags": ["Python", "Django"]
+		"name": "Unicode Decode",
+		"image": "unicode.logolarge.png",
+		"url": "/unicode-decode",
+		"tags": ["Python", "Django", "CSS", "HTML", "JavaScript"]
 	},
 
 ]
